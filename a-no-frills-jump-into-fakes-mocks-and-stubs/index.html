@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> A No Frills Jump Into Fakes, Mocks and Stubs | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="A No Frills Jump Into Fakes, Mocks and Stubs">
+<meta name="keywords" content="">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/a-no-frills-jump-into-fakes-mocks-and-stubs">
+<meta property="og:title" content=" A No Frills Jump Into Fakes, Mocks and Stubs | Jacob Stoebel">
+<meta property="og:description" content="A No Frills Jump Into Fakes, Mocks and Stubs">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" A No Frills Jump Into Fakes, Mocks and Stubs | Jacob Stoebel">
+<meta name="twitter:description" content="A No Frills Jump Into Fakes, Mocks and Stubs">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/a-no-frills-jump-into-fakes-mocks-and-stubs">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>A No Frills Jump Into Fakes, Mocks and Stubs</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2017-04-05"> 2017-04-05
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/a-no-frills-jump-into-fakes-mocks-and-stubs#disqus_thread" data-disqus-identifier="/a-no-frills-jump-into-fakes-mocks-and-stubs">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>As a semi self taught programmer, I've always felt an imposter syndrome flare up when discussion of mocks, stubs, fakes, etc comes up. I knew generally that they were used for testing things that should not or can not be used in a testing environment, but I also knew that you can't really understand and feel comfortable with something until you use it. No more. For anyone else who's felt intimidated by this concept, let me try to dispel that fear by giving you the basic run down:</p>
+<h2>Doubles: The super class</h2>
+<p>When we're testing our code, there are certain resources that we can't or don't want use. So instead we create other objects to stand in for their behavior. The general term for these objects are doubles. I'll explain a few of those types here.</p>
+<h3>Stubs: Let's not and say we did</h3>
+<p>Let's say we have an app that calls out to an API to handle payment. It would be both expensive and silly to have a dedicated credit card that we charge each time we want to ensure our app is running properly. Nor do we need to. Assuming that API is maintained by a reputable company (and if its not why are we using it), its not our job to worry about it failing (at least in the test suite anyway). Even if it does fail (any API can) there would be nothing we can do about it. Its outside the boundary of our responsibility and <em>therefore we don't need to test it</em>. Instead we will create a stub which is simply a stand in object that gives a <em>canned response</em> every time you use it. Let's say in this very simple payment API you send credit card details (number, expiration, name, amount to charge, etc) and get back either <code>true</code> meaning "yes this card was accepted" or <code>false</code> meaning "no this card was rejected". Since this payment API is not our responsibly we can just stub it out. This means that when running tests we say "here I want to test how my code responds when payment is accepted. Rather than hitting the payment API, let's just pretend I did and the response was <code>true</code>".</p>
+<h3>Mocks: Are you using me the way you should?</h3>
+<p>The word mock is sometimes used to refer to the general idea of a test object standing in for a production ready object. Here I am referring to something more specific. <em>A mock is an object that has certain expectations on the way it is called</em>. Let's say you have a production object that makes a call over the network, and you want to implement a test that ensures this network call not only functions properly but is made exactly once. A mock object would be designed to handle this network call and assert that it is made exactly once. If a network call is made twice or not at all, the test will fail, even if everything else works exactly as expected.</p>
+<h3>Fakes: As real as you need them to be</h3>
+<p>Sometimes though we need to test behavior that is inside our realm of  responsibility but for certain reasons we want to avoid doing the same thing as we would in production. Maybe that real object has methods that involve reading from or writing to disk, which when compounded can really slow your test suite down. I encountered this exact problem recently on a project. I was using the <a href="https://rubygems.org/gems/roo/versions/2.7.1">Ruby Gem Roo</a> to parse a spreadsheet. Roo takes an open file and returns an object with a bunch of methods to read from or write to that file. Rather than having my test suite write some data to a spreadsheet, save to disk, then open that file again for processing (which would inflict a performance hit) I created a fake. This fake object has some data and methods bound to it <em>that are similar enough to the real thing</em>. How similar? Similar enough to trick my app into thinking its the real thing.</p>
+<p>Roo has a real class called <code>Sheet</code> which represents a spreadsheet. Let's say my app needs to call the methods <code>row</code> and <code>cell</code> on instances of this class. <code>row</code> accepts an integer and returns an array representation of the corresponding row. <code>cell</code> is handed a column and row coordinate and responds with the corresponding value. No problem, I'll just make a small fake that implements those features.</p>
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Sheet</span>
+      <span class="c1"># a fake of a Roo sheet object</span>
+      <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+        <span class="c1"># arr: a 2D array, similar to the structure of data in a spreadsheet</span>
+        <span class="vi">@arr</span> <span class="o">=</span> <span class="n">arr</span>
+      <span class="k">end</span>
+      <span class="k">def</span> <span class="nf">row</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="c1"># index of row to find (starts at 1)</span>
+        <span class="k">return</span> <span class="vi">@arr</span><span class="p">[</span><span class="n">idx</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+      <span class="k">end</span>
+      <span class="k">def</span> <span class="nf">cell</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span>
+        <span class="c1"># cell to find (both values starts at 1)</span>
+        <span class="k">return</span> <span class="vi">@arr</span><span class="p">[</span><span class="n">row</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">col</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+      <span class="k">end</span>
+    <span class="k">end</span></code></pre></div>
+<p>And that's it! Because Ruby is weakly typed, we simply hand the app this fake object. My app will call <code>row</code> and <code>cell</code> on that object just like it would on the real thing. The fake object behaves the same way with respect to these two methods. The caller doesn't know (or care) about the difference. It won't notice that all of the other methods aren't implemented because it won't try to call them. Are there corner cases to these real methods that I haven't covered in my implementation? Without a doubt. But they won't come up in my use case. If later on they do I will add them. That's what a fake is: as real as it needs to be and no more.</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=A No Frills Jump Into Fakes, Mocks and Stubs&amp;url=/a-no-frills-jump-into-fakes-mocks-and-stubs&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/a-no-frills-jump-into-fakes-mocks-and-stubs"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

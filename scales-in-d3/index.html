@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Scales in D3 | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Scales in D3">
+<meta name="keywords" content="">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/scales-in-d3">
+<meta property="og:title" content=" Scales in D3 | Jacob Stoebel">
+<meta property="og:description" content="Scales in D3">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Scales in D3 | Jacob Stoebel">
+<meta name="twitter:description" content="Scales in D3">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/scales-in-d3">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Scales in D3</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-09-09"> 2016-09-09
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/scales-in-d3#disqus_thread" data-disqus-identifier="/time-series-bar-charts-in-d3">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>This week I began the D3.js section of the <a href="https://www.freecodecamp.com/">Freecodecamp</a> curriculum. In the first challenge we are given an endpoint with US GDP data and must display this data in a <a href="http://codepen.io/jstoebel/pen/GjJaGA">time series bar chart</a>.</p>
+<p>There are plenty of tutorials out there on D3 and even more examples where it is easy enough to copy/paste/change variables and move on. If I was casual user of D3, looking for a quick solution, I might go with the copy/paste solution. However, I want data visualization to be a core competency in my tool belt, so I want to understand D3 deeply. There was one topic in particular that I wrestled with: scales. Here's a quick run down of what they do.</p>
+<h2>Scales</h2>
+<p>I wrestled with this concept a lot on this project. Essentially, the scale maps a series of input values to how they should be displayed visually. Here is a simple example:</p>
+<pre><code>var yScale = d3.scale.linear()
+        .domain([0, 100])
+        .range([0, 500]);
+</code></pre>
+<p>In this example, we are saying we are inputing data from 0 to 100 and expect an output of 0 to 500. An input of 1 expects an output of 5, an input of 2 expects 10 etc. To express this value mathematically, <code>y = 5x</code>. Scales were a very confusing, abstract concept for me at first, but think of it as an expression of the relationship between input data how those values should be represented. This is a common concept for developers: its what all good functions do! In the code snippet above we are merely building up a function that we can later use when drawing our chart, like so:</p>
+<pre><code>var myChart = d3.select("#chart").append('svg')
+      .style('background', '#E7E0CB')
+      ...
+        .selectAll('rect').data(inputData)
+        .enter().append('rect')
+          .attr('height', function(item) {
+            return yScale(item);
+          })
+</code></pre>
+<p>Here, as I a drawing the chart, I am using the yScale function that I built up earlier to determine the height of each bar as a function of its corresponding data input. So if the variable <code>inputData</code> was <code>[1,2,3,4]</code>. The height of the bars would be, respectively, <code>[5, 10, 15, 20]</code></p>
+<h2>Time Scales</h2>
+<p>But what if our scale measures a series time or date data points? Reasoning about dates and times can get hairy fast, but fortunately D3 has a special scale to take care of it for you. In this example I have an array of financial quarters from 1947 to 2015:</p>
+<pre><code>var quarters = ["1947-01-01, "1947-04-01", ... "2015-12-01"];
+var xScale = d3.time.scale()
+        .domain([d3.min(quarters), d3.max(quarters)])
+        .range([0, width])
+</code></pre>
+<p>Why is this so cool? Because D3 automatically understands each of the items in <code>quarters</code> as dates and can reason about them accordingly. In <a href="http://codepen.io/jstoebel/pen/GjJaGA">this example</a>, D3 looks at the range of dates and determines that the axis would be best represented by decade. If, in a different example we had data points for every day in a single month, the axis would automatically adjust, with ticks marking days. Neat, huh?</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Scales in D3&amp;url=/scales-in-d3&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/scales-in-d3"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Moving forward with Rspec/Devise | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="keywords" content="site, website, softwware, software developer, python, djangp, ruby, ruby on rails, javascript, frontend, front-end, html5, css3, jquery, react">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/moving-forward-with-rspecdevise">
+<meta property="og:title" content=" Moving forward with Rspec/Devise | Jacob Stoebel">
+<meta property="og:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Moving forward with Rspec/Devise | Jacob Stoebel">
+<meta name="twitter:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/moving-forward-with-rspecdevise">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Moving forward with Rspec/Devise</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-04-06"> 2016-04-06
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/moving-forward-with-rspecdevise#disqus_thread" data-disqus-identifier="/moving-forward-with-rspecdevise">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>After many hours of struggling mightily, I've come up with fairly (though not completely) DRY solution for running one test as multiple users.</p>
+<h2>The Problem</h2>
+<p>I want to write a module that will let me simulate the login of a type of user, and then call that method in various tests. It would be very unDRY to have to define this as a private method in each test. I followed <a href="https://github.com/plataformatec/devise/wiki/How-To:-Test-controllers-with-Rails-3-and-4-(and-RSpec)">this wiki</a> for help on this.</p>
+<pre><code>module ControllerMacros
+  def login_admin
+    before(:each) do
+      @request.env["devise.mapping"] = Devise.mappings[:admin]
+      sign_in FactoryGirl.create(:admin) # Using factory girl as an example
+    end
+  end
+  def login_user
+    before(:each) do
+      @request.env["devise.mapping"] = Devise.mappings[:user]
+      user = FactoryGirl.create(:user)
+      user.confirm! # or set a confirmed_at inside the factory. Only necessary if you are using the "confirmable" module
+      sign_in user
+    end
+  end
+end
+</code></pre>
+<p>At first glance I couldn't understand how this would fit my needs. What I needed was something like:</p>
+<pre><code>start a test
+    iterate over each allowed user
+        login user
+        run the test
+</code></pre>
+<p>It seemed to me that I needed the ability to login a user of my choice, run a test and then repeat. This business with a before block worked for logging in one specific user, but needing to login a user based on a passed in argument didn't seem possible in this model.</p>
+<p>After some more struggle and thinking,  I came to a revelation: rspec supports loops! It's actually perfectly fine to do this:</p>
+<pre><code>describe "a test" do
+    3.times do |n|
+        context n.to_s do
+            #the test here
+        end
+      end
+    end
+  end
+</code></pre>
+<p>My need for multi user testing my actually be possible. I wrote this module:</p>
+<pre><code>module ControllerMacros
+  ALL_ROLES = ["administrator", "instructor", "regular_user"]
+  def login_as(role_name)
+    before(:each) do
+      #grab the right user
+      @request.env["devise.mapping"] = Devise.mappings[:admin]
+      sign_in user
+    end
+  end
+end
+</code></pre>
+<p>The question then is, how can I user the method's argument to pull the right user. If I look at the model for <code>GlobalRole</code> we see three useful class methods:</p>
+<pre><code>def self.administrator
+  find(ADMINISTRATOR_ID)
+end
+def self.instructor
+  find(INSTRUCTOR_ID)
+end
+def self.regular_user
+  find(REGULAR_USER_ID)
+end
+</code></pre>
+<p>I can call these methods to get the desired role, and then find a user with the corresponding role. But how do I make the right method call based on string argument? Enter the <code>send</code> class method. I can call <code>send</code> with a string on any class and get back the corresponding method.  So to put it all together my method would be:</p>
+<pre><code>def login_as(role_name)
+  before(:each) do
+    user = User.find_by(:global_role_id =&gt; (GlobalRole.send(role_name)).id)
+    sign_in user
+  end
+end
+</code></pre>
+<p>From there, I just need to add factories in that method to create the right role and user right? Wrong. I was getting strange results when trying to create an instructor and getting back a user with global_role_id of 1. What gives? It turns out that the factories, the way they are constructed now, assumes that roles will be constructed in this order (admin, instructor, regular_user). If we try to create the instructor role first, it will have global_role_id = 1 which in the model is tied to admin. We might want to address this for later. The work around is to have to define all roles and users for each test.</p>
+<p>At any rate, the final, DRY(ish) test would look like this.</p>
+<pre><code>#controller_macros.rb
+module ControllerMacros
+  ALL_ROLES = ["administrator", "instructor", "regular_user"]
+  def login_as(role_name)
+    before(:each) do
+      user = User.find_by(:global_role_id =&gt; (GlobalRole.send(role_name)).id)
+      sign_in user
+    end
+  end
+end
+#questions_controller_spec.rb
+require 'spec_helper'
+RSpec.describe QuestionsController, :type =&gt; :controller do
+  include Devise::TestHelpers
+  before(:each) do
+    FactoryGirl.create :global_role_admin
+    FactoryGirl.create :admin, {:email =&gt; "admin@test.org"}
+    FactoryGirl.create :global_role_instructor
+    FactoryGirl.create :instructor_user, {:email =&gt; "instructor@test.org"}
+    FactoryGirl.create :global_role_user
+    FactoryGirl.create :confirmed_user, {:email =&gt; "student@test.org"}
+    FactoryGirl.create :exercise
+    FactoryGirl.create :question
+  end
+  describe "GET index" do
+    ControllerMacros::ALL_ROLES.each do |r|
+      context "as #{r}" do
+        login_as r
+        it "returns http success" do
+          get :index
+          expect(response).to have_http_status(:success)
+        end
+        it "pulls all questions" do
+          get :index
+          assigns(:questions).should
+          expect(assigns(:questions)).to eq(Question.all)
+        end
+        it "renders the index view" do
+          get :index
+          expect(response).to render_template("index")
+        end
+      end
+    end
+  end
+</code></pre>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Moving forward with Rspec/Devise&amp;url=/moving-forward-with-rspecdevise&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/moving-forward-with-rspecdevise"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

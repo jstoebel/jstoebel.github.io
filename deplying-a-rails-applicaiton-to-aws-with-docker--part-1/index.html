@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Deplying a Rails Applicaiton to AWS with Docker  Part 1 | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Deplying a Rails Applicaiton to AWS with Docker- Part 1">
+<meta name="keywords" content="">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/deplying-a-rails-applicaiton-to-aws-with-docker--part-1">
+<meta property="og:title" content=" Deplying a Rails Applicaiton to AWS with Docker  Part 1 | Jacob Stoebel">
+<meta property="og:description" content="Deplying a Rails Applicaiton to AWS with Docker- Part 1">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Deplying a Rails Applicaiton to AWS with Docker  Part 1 | Jacob Stoebel">
+<meta name="twitter:description" content="Deplying a Rails Applicaiton to AWS with Docker- Part 1">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/deplying-a-rails-applicaiton-to-aws-with-docker--part-1">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Deplying a Rails Applicaiton to AWS with Docker  Part 1</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2017-12-02"> 2017-12-02
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/deplying-a-rails-applicaiton-to-aws-with-docker--part-1#disqus_thread" data-disqus-identifier="/deplying-a-rails-applicaiton-to-aws-with-docker--part-1">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <h1>setting up dev enviornment</h1>
+<ul>
+<li>followed this tutorial: https://docs.docker.com/compose/rails/</li>
+<li>need to mount my host system to get at source code:</li>
+<li>needed to persist postgres data back to host system once container is finished.</li>
+<li>rake task to start up</li>
+<li>need to point at the <code>docker-compose.yml</code> and give correct build context</li>
+</ul>
+<p>I've been working with Docker and Rails for a bit now and really love it. It makes for huge wins both in terms of setting up your development environment and deploying to AWS, but the steps to get started aren't always obvious. That's why I decided to document my steps in a series of blog articles. In this first part, I'll go over how to set up a development environment.</p>
+<h1>My assumptions</h1>
+<ul>
+<li>you have a basic familiarity with Rails and how to set up a project</li>
+<li>You know how to read YAML</li>
+<li>You have Rails and Yarn installed on your local machine</li>
+<li>You have heard of Docker before and at least vaguely have a sense of what it does, even if you've never used it. (If not that's ok, spend a few minutes Googling and then come back.)</li>
+</ul>
+<h1>Why would I want to do this?</h1>
+<p>Recently there was something strange going on with my instillation of either Postgres or Homebrew on my Macbook. Rather than working to get the bottom of it for the umpteenth time I decided to just run my Rails project locally in a Docker container.</p>
+<h1>Start your rails project</h1>
+<p>To keep this example as simple as possible I am going to spin up a new Rails project and then get it running inside a container. Let's stat by creating a new Rails project:</p>
+<pre><code>rails new docker_test --database=postgresql --webpack="react"
+</code></pre>
+<p>We get a whole bunch of output as rails generates then project and then sets up for webpack. The webpack bit isn't strictly speaking a requirement for this, but I think its helpful to remember that most real Rails projects will need to have some fronted assets built before running in production. React is my preferred front end library but really anything would do here.</p>
+<p>Next I am going to generate a super simple scaffold, really just as a way to verify that my database is working. This will be a trivial app that lets me record the names of my friends.</p>
+<pre><code>rails g scaffold friend name:string
+</code></pre>
+<p>More output verifies that my scaffold files have been generated. Normally at this point my next step would be to <code>bundle exec rake db:migrate</code>, But we're not trying to use Postgres on my local machine. I want to use the postgres image inside of a Docker container.</p>
+<h1>Set up Docker</h1>
+<p>Let's get set up to run this app inside Docker. First in your root directory create the file <code>Dockerfile</code>. Then inside that file drop the following:</p>
+<pre><code>FROM ruby:2.4
+# basic dependencies
+RUN apt-get update -qq &amp;&amp; apt-get install -y build-essential libpq-dev
+# Install capybara-webkit deps
+RUN apt-get update \
+    &amp;&amp; apt-get install -y xvfb qt5-default libqt5webkit5-dev \
+                          gstreamer1.0-plugins-base gstreamer1.0-tools gstreamer1.0-x
+# Node.js
+RUN curl -sL https://deb.nodesource.com/setup_7.x | bash - \
+    &amp;&amp; apt-get install -y nodejs
+# selenium
+RUN apt-get install -y python-pip
+RUN pip install selenium
+# Chrome
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN dpkg -i google-chrome-stable_current_amd64.deb; apt-get -fy install
+RUN mkdir /docker_test
+WORKDIR /docker_test
+ADD Gemfile /docker_test/Gemfile
+ADD Gemfile.lock /docker_test/Gemfile.lock
+RUN bundle install
+ADD . /docker_test
+</code></pre>
+<p>Let's step through this file chunk by chunk. The first line <code>FROM ruby:2.4</code> indicates the base image that you're docker container will be staring from. In this case, your pulling in Ruby 2.4 into your container. The next several <code>RUN</code> commands through to <code>RUN dpkg -i google-chrome-stable_current_amd64.deb; apt-get -fy install</code> are installing dependencies into the container. This gets us setup for the things we will need in a realistic rails project. Things like Capybara and Selenium for integration tests. I'll have more to say about this file in a minute.</p>
+<p>Next create a directory <code>config/docker/development</code>. In that directory create the file <code>docker-compose.yml</code>. Inside that file place the following:</p>
+<pre><code>version: '3'
+services:
+  db:
+    image: postgres
+    ports:
+      - "5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+  web:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid &amp;&amp; bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - .:/docker_test
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+</code></pre>
+<h1>Build container and set up project</h1>
+<p>Next we'll get the environment set up:</p>
+<pre><code>docker-compose -f config/docker/development/docker-compose.yml --project-directory . build
+</code></pre>
+<p>This command says: "using the <code>docker-compose.yml</code> file (the -f flag indicates its not in the current directory) please build this project. the <code>--project-directory</code> flag tells us the context of this project (in this case the root of our rails project). If we had not provided this argument, when docker goes to build my project, all relative paths would be relative to the location of the docker-compose file. Directories above that directory would not be allowed.</p>
+<p>Why does this matter? Take a look at the <code>docker-compose.yml</code> file. For example, under <code>web -&gt; volumes</code> we have the value <code>.:/docker_test</code>. The idea here is that we are providing the container access to the entire code repo. If I make changes to the source code while developing, I won't need to rebuild the whole thing for my container to have access. If I had not set <code>--project-directory</code> to point at my rails root, then my container would have access to the location of the docker-compose file, specifically, <code>config/docker/development</code>. Not what we want. Its also worth pointing out the line <code>./postgres-data:/var/lib/postgresql/data</code> under <code>db -&gt; volumes</code>. This specifies that data created in the container will be persisted back to my local machine. You probably don't want to check this data into source control so be sure to add it to <code>.gitignore</code>.</p>
+<p>Next we are ready to start up the project. <code>docker-compose -f config/docker/development/docker-compose.yml --project-directory . up</code>. You should get output similar to the following?</p>
+<pre><code>dockertest_db_1 is up-to-date
+Starting dockertest_web_1 ...
+Starting dockertest_web_1 ... done
+Attaching to dockertest_db_1, dockertest_web_1
+db_1   | 2017-12-04 18:46:45.546 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+db_1   | 2017-12-04 18:46:45.546 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+db_1   | 2017-12-04 18:46:45.693 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+db_1   | 2017-12-04 18:46:45.954 UTC [23] LOG:  database system was shut down at 2017-12-04 18:22:39 UTC
+db_1   | 2017-12-04 18:46:46.193 UTC [1] LOG:  database system is ready to accept connections
+db_1   | 2017-12-04 18:47:10.441 UTC [30] FATAL:  database "docker_test_dev" does not exist
+db_1   | 2017-12-04 18:47:27.993 UTC [1] LOG:  received smart shutdown request
+db_1   | 2017-12-04 18:47:28.025 UTC [1] LOG:  worker process: logical replication launcher (PID 29) exited with exit code 1
+db_1   | 2017-12-04 18:47:28.028 UTC [24] LOG:  shutting down
+db_1   | 2017-12-04 18:47:28.070 UTC [1] LOG:  database system is shut down
+db_1   | 2017-12-04 18:48:53.186 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+db_1   | 2017-12-04 18:48:53.186 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+db_1   | 2017-12-04 18:48:53.191 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+db_1   | 2017-12-04 18:48:53.261 UTC [23] LOG:  database system was shut down at 2017-12-04 18:47:28 UTC
+db_1   | 2017-12-04 18:48:53.357 UTC [1] LOG:  database system is ready to accept connections
+web_1  | =&gt; Booting Puma
+web_1  | =&gt; Rails 5.1.4 application starting in development
+web_1  | =&gt; Run `rails server -h` for more startup options
+web_1  | Puma starting in single mode...
+web_1  | * Version 3.11.0 (ruby 2.4.2-p198), codename: Love Song
+web_1  | * Min threads: 5, max threads: 5
+web_1  | * Environment: development
+web_1  | * Listening on tcp://0.0.0.0:3000
+web_1  | Use Ctrl-C to stop
+</code></pre>
+<p>Our project is now running! You should be able to access it from <code>localhost:3000</code>.</p>
+<p>Next we need to set up the database and run migrations <em>inside</em> the container. To do this we have a command called <code>run</code>. In a separate console tab run:</p>
+<pre><code>docker-compose -f config/docker/development/docker-compose.yml --project-directory . run web rake db:create db:migrate
+</code></pre>
+<p>This tells your service labeled <code>web</code> to run the given rake commands. Sweet, our project is up and running!</p>
+<h1>Using rake to do less typing</h1>
+<p>Typing out <code>docker-compose -f blah blah blah</code> is tiersome! Let's make a rake task to make it easier:</p>
+<pre><code>desc 'ensure no sneaky rails envs.'
+task :assert_env do
+  raise 'Invalid env' unless /production|development/ =~ Rails.env
+end
+desc 'Run docker-compose command with the correct settings '
+task docker_compose: %w[environment assert_env] do
+  options = {}
+  OptionParser.new do |opts|
+    opts.banner = 'Usage: rake docker_compose -cmd'
+    opts.on('-c', '--command ARG', String) { |cmd| options[:cmd] = cmd }
+  end.parse!
+  command_str = 'docker-compose ' \
+      "-f config/docker/#{Rails.env}/docker-compose.yml " \
+      "--project-directory #{Rails.root} " \
+      "#{options[:cmd]}"
+  puts command_str
+  exec command_str
+end
+</code></pre>
+<p>The rake task <code>docker_compose</code> does the following:</p>
+<ul>
+<li>asserts that <code>RAILS_ENV</code> is either <code>development</code> or <code>production</code>. We could add other's later, or remove this assertion entirely, but since we are using <code>Rails.env</code> to reference a directory I wanted to put some constraints around acceptable inputs.</li>
+<li>Parses the command passed to the <code>-c</code> flag. This will be the bit that comes after the long and boring <code>docker-compose -f config/docker/development/docker-compose.yml --project-directory .</code></li>
+<li>prints the command to screen</li>
+<li>execs the command so we can see its output.</li>
+</ul>
+<p>For example, to bring my container <code>up</code> I type <code>bundle exec rake docker_compose -c up</code>. To run a rake task against it: <code>bundle exec rake docker_compose -c "rake db:migrate"</code> Yay!</p>
+<p>In the next few posts I'll talk about how to set up a docker for production and deployment.</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Deplying a Rails Applicaiton to AWS with Docker  Part 1&amp;url=/deplying-a-rails-applicaiton-to-aws-with-docker--part-1&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/deplying-a-rails-applicaiton-to-aws-with-docker--part-1"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

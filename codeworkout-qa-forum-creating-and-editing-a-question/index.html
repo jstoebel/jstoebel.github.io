@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> CodeWorkout Q&amp;A forum, creating and editing a question | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="keywords" content="site, website, softwware, software developer, python, djangp, ruby, ruby on rails, javascript, frontend, front-end, html5, css3, jquery, react">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/codeworkout-qa-forum-creating-and-editing-a-question">
+<meta property="og:title" content=" CodeWorkout Q&amp;A forum, creating and editing a question | Jacob Stoebel">
+<meta property="og:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" CodeWorkout Q&amp;A forum, creating and editing a question | Jacob Stoebel">
+<meta name="twitter:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/codeworkout-qa-forum-creating-and-editing-a-question">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>CodeWorkout Q&A forum, creating and editing a question</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-03-12"> 2016-03-12
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/codeworkout-qa-forum-creating-and-editing-a-question#disqus_thread" data-disqus-identifier="/codeworkout-qa-forum-creating-and-editing-a-question">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>Over spring break, I added the features to create and edit a question in our new CodeWorkout Q&amp;A forum. Here's a summary of that work:</p>
+<h2>Controller Actions</h2>
+<p>Here's the work I added to the relevant controller actions:</p>
+<pre><code>def new
+  #pre:
+    #exercise_id (optional): the exercise this question should be associated
+    #with
+  #post: a new question object is instantiated but not saved
+    #question#new is rendered
+  @question = Question.new({
+    :exercise_id =&gt; params[:exercise_id]
+    })
+end
+def create
+  #pre:
+    #params: the parameters to be used to create this question
+  #post: 
+    #a new question object is saved -&gt; redirect to index
+    #OR new question is not saved -&gt; render new
+  @question = Question.new(safe_assign)
+  @question.user_id = current_user.id
+  if @question.save
+    flash[:success] = "Question saved!"
+    redirect_to questions_path
+  else
+    flash[:error] = "Error creating your question."
+    render 'new'
+  end
+end
+def edit
+  #pre:
+    #id: the id of the question to edit
+  #post:
+    #edit view is rendered
+  @question = Question.find(params[:id])
+end
+def update
+  #pre:
+    #params: question attributes to be assigned
+  #post
+    #the question object is saved -&gt; redirect to index
+    #OR new question is not saved -&gt; render edit
+  @question = Question.find(params[:id])
+  @question.assign_attributes(safe_assign)
+  if @question.save
+    flash[:success] = "Question saved!"
+    redirect_to questions_path
+  else
+    flash[:error] = "Error updating question."
+    render 'edit'      
+  end
+end
+private
+def safe_assign
+  params.require(:question).permit(:title, :body, :tags, :exercise_id)
+end
+</code></pre>
+<p>The flow of control works like this: when a user makes a request for <code>/questions/new</code> they hit the action <code>new</code>. In that action we make a new <code>Question</code> object and (implicitly) render <code>new.html.haml</code>. Also, if an exercise_id was passed into params we add that to the question (more on this later).</p>
+<h3>The View</h3>
+<p>Here is <code>new.html.haml</code></p>
+<pre><code>=link_to questions_path do
+    .btn.btn-default
+        %span.glyphicon.glyphicon-arrow-left
+            Back
+%h1 Create a new Question
+=render(:partial =&gt; 'application/record_error_messages', :locals =&gt; {:record =&gt; @question})
+= form_for(@question, url: questions_path) do |f|
+    =render partial: 'form', :locals =&gt; {:f =&gt; f}
+    = submit_tag("Submit")
+</code></pre>
+<p>This view uses form helpers to speed up the process of creating a form. For more info on this check out <a href="http://guides.rubyonrails.org/form_helpers.html">this resource</a>. They are super useful and save a lot of time from debugging later on. This form also calls a method called render. You'll notice that the actual fields of the form aren't listed here. The reason why is that they are separated out in a partial view (or simply a partial in Rails parlance). Since the new form and edit form have a lot in common, those commonalities are typed out only once, and then when each respective form needs its fields, it simply renders the partial <code>_form.html.haml</code>. Here it is:</p>
+<pre><code>%table
+  %tr
+    %th
+      = f.label :title, "Title"
+    %td
+      = f.text_field :title
+  %tr
+    %th
+      = f.label :body, "Your Question"
+    %td
+      = f.text_area :body
+  %tr
+    %th
+      = f.label :tags, "Tags"
+    %td
+      = f.text_field :tags
+  %tr
+    %th
+    %td
+      = f.hidden_field :exercise_id, :value =&gt; @question.exercise_id 
+</code></pre>
+<p>When the user submits the new form, they are routed to the <code>create</code> controller. All of the parameters are assigned in one go by calling the private method <code>safe_assign</code>. Why? One way to assign attributes is to type</p>
+<pre><code>@question.title = params[:question][:title]
+@question.body = params[:question][:body]
+...
+zzz
+</code></pre>
+<p>But this could require a lot of typing and doesn't follow the principal of DRY (Don't Repeat Your Self). The other option would be to simply assign all of the attributes in one statement like so: <code>@question.assign_attributes(params[:question])</code> But this has serious security flaws. A bad guy could easily alter the html form and add inject additional parameters into the form. What if, for example they alter the user_id of the question? Bad news. Instead we use <code>require</code> and <code>permit</code> to specify the parameters we are letting in (this is called white listing). Every other parameter is filtered out.</p>
+<h2>edit/update</h2>
+<p>The process to edit a question follows a very similar pattern as creating a new question:</p>
+<ul>
+<li>The user requests <code>/questions/:id/edit</code></li>
+<li>The question object is looked up in the database.</li>
+<li>the form is populated with the current attributes (we get this feature for free with form helpers)</li>
+<li>The user submits their question.</li>
+<li>The <code>create</code> action assigns parameters and saves them.</li>
+</ul>
+<h2>Error handling</h2>
+<p>What if a user makes a mistake in submitting a question? What if for example, they don't provide a title or a question body? We could make this a requirement at the database layer, but then we would get a big ugly MySQL error that our application wouldn't be able to handle gracefully. Instead we can add validations to the Question model:</p>
+<pre><code>class Question &lt; ActiveRecord::Base
+    #VALIDATIONS
+    validates :title,
+        presence: { message: "Question does not have a title."}
+    validates :body,
+        presence: { message: "Question does not have a body."}
+end
+</code></pre>
+<p>Basically what's happening here is when we go to <code>save</code> a question, the object runs its validations. If the <code>title</code> or <code>body</code> is missing it will not save anything to the database and error messages will be generated. The application won't crash however, its our job as programmers to report those errors back to the user so they can correct them. I created a second partial for doing just that:</p>
+<pre><code>.container
+  .row
+    .col-xs-12.col-md-4.col-md-offset-4
+      - if record &amp;&amp; record.errors.size &gt; 0
+        #errorExplanation
+          %h2.alert-danger
+            = pluralize(record.errors.size, "error") 
+            prohibited this record from being saved.
+          %p The following problems were encountered:
+          %ul
+            - record.errors.messages.values.each do |msg|
+              - msg.each do |m|
+                %li
+                  =m
+          %ul
+</code></pre>
+<p>If an error is encountered we keep the user on the same form and show them the reasons why the record can't be saved. This error partial will actually work for any Active Record object, so we can use it throughout the forum.</p>
+<h2>Associating with an exercise</h2>
+<p>Finally, I wanted to add a feature where a student who is stuck on an exercise can click a help button and create a new question associated with that exercise. To do that I edited the routes file from</p>
+<pre><code>resources :exercises
+</code></pre>
+<p>to</p>
+<pre><code>resources :exercises do
+  resources :questions, :only =&gt; [:new]
+end
+</code></pre>
+<p>This creates a new possible route <code>    /gym/exercises/:exercise_id/questions/new(.:format)</code>. This means that when the user hits the <code>new</code> controller they may have also submitted an <code>exercise_id</code> If so we assign it to the newly instantiated question and render the form. How do we pass that <code>exercise_id</code> to the <code>create</code> action though? HTTP is inherently stateless meaning that it has no way of knowing "where the user came from" We don't want to make the user select the exercise they want to tag it with since they have implicitly indicated the exercise by clicking a help button on that exercise page. Instead of making them enter it again, we can pre populate a field in the form, and since, they really don't need to see it, we can make it invisible. So in short, if a user submits a new question and came from an exercise page, that question is tied to that exercise. If no exercise_id was passed into the parameters, the question's exercise_id will be <code>nil</code> which is exactly what we expect.</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=CodeWorkout Q&A forum, creating and editing a question&amp;url=/codeworkout-qa-forum-creating-and-editing-a-question&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/codeworkout-qa-forum-creating-and-editing-a-question"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

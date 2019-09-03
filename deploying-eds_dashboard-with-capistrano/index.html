@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Deploying eds_dashboard with Capistrano | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Deploying eds_dashboard with Capistrano">
+<meta name="keywords" content="">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/deploying-eds_dashboard-with-capistrano">
+<meta property="og:title" content=" Deploying eds_dashboard with Capistrano | Jacob Stoebel">
+<meta property="og:description" content="Deploying eds_dashboard with Capistrano">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Deploying eds_dashboard with Capistrano | Jacob Stoebel">
+<meta name="twitter:description" content="Deploying eds_dashboard with Capistrano">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/deploying-eds_dashboard-with-capistrano">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Deploying eds_dashboard with Capistrano</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-03-07"> 2016-03-07
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/deploying-eds_dashboard-with-capistrano#disqus_thread" data-disqus-identifier="/deploying-eds_dashboard-with-capistrano">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>Capistrano is a great way to automate deployment of new versions of a Rails app. Even with a relatively simple deployment like we have for the EDS Dashboard (one server) its becoming clear that we don't want to take the chance with human error when it comes to deployment. The more "set it and forget it" we can do the better. Capistrano has <a href="https://www.phusionpassenger.com/library/deploy/apache/automating_app_updates/ruby/">plenty of documentation</a> out there but since it is so flexible, the important thing is to document how we are configuring this particular project:</p>
+<h2>Configuration</h2>
+<p>Capistrano does its job using several files loaded into your repository:</p>
+<ul>
+<li><p><strong>Capfile</strong> lists a series of recipes that Capistrano needs to perform. Common tasks like running <code>bundle install</code> <code>rake db:migrate</code> or restarting your web server are typically included as external libraries and they usually just work right out of the box.</p></li>
+<li><p><strong>config/deploy.rb</strong> Contains a series of tasks you can run for deployment. The task that comes out of the box is as follows:</p></li>
+</ul>
+<pre><code class="`"> namespace :deploy do
+   after :restart, :clear_cache do
+     on roles(:web), in: :groups, limit: 3, wait: 10 do
+      # put anything else you want here.
+     end
+   end
+ end
+</code></pre>
+<p> In our case this is perfect for us as is. It deploys our code, runs all of the set up, restarts the web server and we are good to go. If we needed other intermediate tasks we could put them here.</p>
+<ul>
+<li><strong>deploy/production.rb and deploy/staging.rb</strong> These files provide more specific control for different environments. One thing we definitely need to provide here is the server name and user name of our production server. Capistrano will SSH into this server so be sure that SSH keys are set up properly.</li>
+</ul>
+<p>There are some other settings here that are worth a quick explanation</p>
+<ul>
+<li><code>deploy_to</code>: the location of where the application should be deployed. If nothing is placed here, the default will be /var/www. and <em>not</em> in the user's home directory.</li>
+<li><code>default_env</code>: any other environment variables you need set when running the deployment. In our case we need the location of our Oracle client in order to setup <code>ruby-oci8</code>.</li>
+</ul>
+<p> ## Shared Files</p>
+<p>This topic was a bit tricky, so its worth going into. There are some files in our app that for various reasons are not checked into source control and therefore persist or are shared between each deployment. In our case, this is <code>database.yml</code>, <code>secrets.yml</code> and all of the uploaded student files in <code>public/student_files</code>. Capistrano provides a shared location for these files, conveniently called <code>shared</code>. The currently deployed version of the app will reference the files in that directory. Setting this up takes two steps:</p>
+<h4>specify which files and dirs will be referenced</h4>
+<p>In <code>deploy.rb</code> indicate which files we be referenced in <code>shared</code>:</p>
+<pre><code>set :linked_files, fetch(:linked_files, []).push('config/database.yml', 'config/secrets.yml')
+set :linked_dirs, fetch(:linked_dirs, []).push('log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'vendor/bundle', 'public/system', 'public/student_files')
+</code></pre>
+<h4>move the files to the shared location</h4>
+<p>In our case this means we need to make the following moves
+ - <code>config/database.yml</code> -> <code>shared/config/database.yml</code>
+ - <code>config/secrets.yml</code> -> <code>shared/config/secrets.yml</code>
+ - <code>public/student_files</code> -> <code>shared/public/student_files</code></p>
+<p>These files will live there permanently. Deployments of the app will come and go, each referencing these locations in turn, but as old deployments are removed, these files won't be affected.</p>
+<h2>A note about <code>Rails.root</code></h2>
+<p>You may be asking your self, "self, my files have moved into <code>shared</code>. Does that mean I must change the path to reference them in any model using <code>Paperclip</code>?" The answer is no and the reason is because <code>Rails.root</code> is automatically altered to reference files in the current deployment. You can check it our for yourself if you are curious, but essentially, if you move the files to share, and specific them in <code>deploy.rb</code> the app will find them like normal. No changes to models needed!</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Deploying eds_dashboard with Capistrano&amp;url=/deploying-eds_dashboard-with-capistrano&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/deploying-eds_dashboard-with-capistrano"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

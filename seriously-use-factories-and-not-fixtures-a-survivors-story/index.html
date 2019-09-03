@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Seriously, Use Factories and Not Fixtures: A Survivor&#39;s Story | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Seriously, Use Factories and Not Fixtures: A Survivor&#39;s Story">
+<meta name="keywords" content="">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/seriously-use-factories-and-not-fixtures-a-survivors-story">
+<meta property="og:title" content=" Seriously, Use Factories and Not Fixtures: A Survivor&#39;s Story | Jacob Stoebel">
+<meta property="og:description" content="Seriously, Use Factories and Not Fixtures: A Survivor&#39;s Story">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Seriously, Use Factories and Not Fixtures: A Survivor&#39;s Story | Jacob Stoebel">
+<meta name="twitter:description" content="Seriously, Use Factories and Not Fixtures: A Survivor&#39;s Story">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/seriously-use-factories-and-not-fixtures-a-survivors-story">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Seriously, Use Factories and Not Fixtures: A Survivor's Story</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2017-01-05"> 2017-01-05
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/seriously-use-factories-and-not-fixtures-a-survivors-story#disqus_thread" data-disqus-identifier="/seriously-use-factories-and-not-fixtures-a-survivors-story">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>The Internet is abound with opinions on using fixtures or Factories in Rails. Being a relatively new developer, I'm usually careful about having strong opinions, but now that I've lived a one year struggle with fixtures and emerged on other side 99% fixture free in my work app, I am coming down firmly on the side of <code>Factory Girl</code>. There are clearly many smart developers out there using fixtures. I won't claim to be smarter than them, but given my experience with them, factories just make more sense for my use case. Here's my story.</p>
+<h2>The original decision</h2>
+<p>My current work project, the EDS Dashboard at Berea College, was my first non-trivial Rails project. When the time came to select technologies for testing, one of my top priorities was to go with something that was tried and tested. Something that people smarter than me have struggled with, blogged about, asked and answered questions about on Stackoverflow. Something even a little boring. To that end I went with the advice to go with Rails default choice, <code>TestUnit</code> and fixtures. It turned out this advice may have been arguably a bit outdated as <code>Rspec</code> has seen great adoption over the years, but that's another story. (God I wish I could have my tests in <code>Rspec</code>, I just love it so much).</p>
+<p>On its face, fixtures seems like a simple, elegant concept. We define a yaml file for each table in the app. We create records that we want inserted into the database for each test by just defining them in the file. There's easy support for foreign keys, erb tags are allowed, we can omit attributes and they are filled in for us. Easy.</p>
+<p>The problems came as our app began to grow. We found ourselves with an overwhelming number of combinations of state that we needed to spin up and test. For example a student in the dashboard can be:</p>
+<ul>
+<li>prospective with no forms of intention</li>
+<li>prospective WITH forms of intention</li>
+<li>admitted to a program</li>
+<li>admitted to two programs</li>
+<li>exited as a completer</li>
+<li>exited by dropping out</li>
+<li>...</li>
+</ul>
+<p>You get the idea. We had to constantly pull down a record from the database, modify it, add associated records, etc. Essentially fixtures only got us part of the way there.  Yes, we could have added more fixtures, but that quickly seemed like a daunting task. We were also running into problems where we had to account for preexisting state at the beginning of the test. Essentially we were starting all of our tests with baggage that had to be accounted for. I can't tell you how many times we struggled to understand why a test case wasn't passing only to discover later that "oh yeah, there's already a record from fixtures there!"</p>
+<h2>Making the switch</h2>
+<p>Switching a developed app from fixtures to factories was not a simple process. Everyone on our team devoted time on and off over the last few months. It started with deleting all of our fixtures except for a very small number of canonical fixtures (records that are so essential to the logic of the app, that we are willing to keep them baked in to every test.) Many of the test cases were fixed with a simple one line change. Other's less so. It turns out that baked in state is like a complex series of threads. If I pull one, suddenly three others come loose too. It was a time consuming, sometimes exhausting project, but the app is better off for it. Technical debt has been paid down. The most immediate reward is that team members no longer need to account for nearly as much state when they begin writing new tests. We expect see the reward in the form of time saved start to accrue soon.</p>
+<h2>Conclusion</h2>
+<p>Are fixtures <em>ever</em> a better choice? Sure! But having struggled with the consequences of making the wrong choice and then struggled more with paying down that technical debt I think it comes down to a few things to consider.</p>
+<ul>
+<li>How simple are your models?</li>
+<li>How interconnected are they?</li>
+<li>How many common flavors of each entity (a prospective student, an admitted student, a completer etc) are there?</li>
+<li>And of course scalability. What's the likelihood any of the above will get more complex in the future?</li>
+</ul>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Seriously, Use Factories and Not Fixtures: A Survivor's Story&amp;url=/seriously-use-factories-and-not-fixtures-a-survivors-story&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/seriously-use-factories-and-not-fixtures-a-survivors-story"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

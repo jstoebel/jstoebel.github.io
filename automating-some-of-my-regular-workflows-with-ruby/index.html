@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Automating Some Of My Regular Workflows With Ruby | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Automating Some Of My Regular Workflows With Ruby">
+<meta name="keywords" content="">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/automating-some-of-my-regular-workflows-with-ruby">
+<meta property="og:title" content=" Automating Some Of My Regular Workflows With Ruby | Jacob Stoebel">
+<meta property="og:description" content="Automating Some Of My Regular Workflows With Ruby">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Automating Some Of My Regular Workflows With Ruby | Jacob Stoebel">
+<meta name="twitter:description" content="Automating Some Of My Regular Workflows With Ruby">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/automating-some-of-my-regular-workflows-with-ruby">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Automating Some Of My Regular Workflows With Ruby</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2018-08-29"> 2018-08-29
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/automating-some-of-my-regular-workflows-with-ruby#disqus_thread" data-disqus-identifier="/automating-some-of-my-regular-workflows-with-ruby">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>At my day job, I maintain dozens of different rails projects for various clients. One thing I need do to frequently throughout my day is deploy projects, both to staging and production. We use capistrano to handle all of our deployments, but sometimes just the command to kick things off can be too much typing/thinking. For example this is typically the command I use to deploy a project to staging</p>
+<pre><code>BRANCH='some_branch' bundle exec cap staging deploy:clobber_npm deploy:clobber_lock deploy;
+</code></pre>
+<p>After doing some thinking I realized, <em>this is a lot of typing for what amounts to the same thing over and over</em>. In most cases I want to do one of two things.</p>
+<p>1) Deploy to stage, my current branch, while clobbering the lock and npm
+2) Deploy master to production</p>
+<p>Going with the the rails philosophy of embracing sensibile defaults, I created a CLI command that let's me perform the most typical things by default and have control when I need to configure something.</p>
+<p>To deploy my current branch to stage its just:</p>
+<pre><code>epub deploy
+</code></pre>
+<p>to deploy to production:</p>
+<pre><code>epub deploy --stage="production"
+</code></pre>
+<p>And when I need to, I can control the branch and if I am clobbering the deploy lock and/or npm</p>
+<pre><code>epub deploy --stage="production" --branch="my_other_branch" --clobber_npm --clobber_lock
+</code></pre>
+<h2>Set it an forget it</h2>
+<p>On some days I deploy up to a dozen times or more. Often, more than one project is working at a time. I can sometimes get overwhelmed by all of the tasks I'm trying to juggle in my mind at one time. That's why I have an audio message set to let me know when a command is finished. That way I can put it out of my mind and know that the machine will let me know when things are done and I can take more action. In the mean time I can get some tea or work on another task.</p>
+<h2>Coping Databases</h2>
+<p>An even more painful workflow that I was experiencing was copying a database from staging or production to my local machine. To do that I had to:</p>
+<ol>
+<li>ssh into the app server</li>
+<li>run <code>rake db:backup</code></li>
+<li>Wait while the database is dumped, trying not to forget about it.</li>
+<li><code>scp</code> the file down. Wait some more.</li>
+<li>unzip the file.</li>
+<li>run the resulting sql file against my local database. More waiting.</li>
+</ol>
+<p>All of this can take 15 minutes or more. That's time spent trying to work on something else, while having to keep part of my attention on how this is going. If I wan't paying attention, I could run <code>rake db:backup</code> and then forget all about it. Way too much context switching! We used to have a command in all of our projects call <code>rake db:copy</code> which pulled down the database all in one step, but its implementation was found to be problematic for production so we had to scrap it. I wanted to write a script that set out to automate all of the steps that I normally perform one by one, but not requring any user input in the middle. So I made <code>epub copy_db</code>. Now I can issue the command, devote my attention to more important things and come back when everything is ready to go.</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Automating Some Of My Regular Workflows With Ruby&amp;url=/automating-some-of-my-regular-workflows-with-ruby&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/automating-some-of-my-regular-workflows-with-ruby"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

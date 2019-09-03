@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> setting up a wordpress/rails vps with ansible | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="setting up a wordpress/rails vps with ansible">
+<meta name="keywords" content="">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/setting-up-a-wordpressrails-vps-with-ansible">
+<meta property="og:title" content=" setting up a wordpress/rails vps with ansible | Jacob Stoebel">
+<meta property="og:description" content="setting up a wordpress/rails vps with ansible">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" setting up a wordpress/rails vps with ansible | Jacob Stoebel">
+<meta name="twitter:description" content="setting up a wordpress/rails vps with ansible">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/setting-up-a-wordpressrails-vps-with-ansible">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>setting up a wordpress/rails vps with ansible</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2017-02-19"> 2017-02-19
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/setting-up-a-wordpressrails-vps-with-ansible#disqus_thread" data-disqus-identifier="/setting-up-a-wordpressrails-vps-with-ansible">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>For my latest project with <a href="http://www.mttechmedia.com/">Mountain Tech Media</a> I decided to take some extra time use Ansible to set up my VPS. I looked at Ansible as well as Chef, and while I don't pretend to be an expert on either, I found Ansible to be a bit more friendly for beginners with small projects who just want to get up and running. I found <a href="https://sysadmincasts.com/episodes/45-learning-ansible-with-vagrant-part-2-4">this tutorial</a> to be incredibly helpful in getting a Vagrant development environment setup. Check it out.</p>
+<p>There were however a few small issues that caused me a disproportionate level of confusion in getting things setup:</p>
+<h3>how much memory?</h3>
+<p>It turns out that 256 Mb of memory isn't enough to install MySQL. You will likely get the error: <code>invoke-rc.d: initscript mysql, action "start" failed.
+ dpkg: error processing package mysql-server-5.5 (--configure):</code>. To fix this, I increased memory allocation to 1Gb:</p>
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">config</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">define</span> <span class="ss">:node</span> <span class="k">do</span> <span class="o">|</span><span class="n">node</span><span class="o">|</span>
+    <span class="c1"># the droplet to provision</span>
+    <span class="n">node</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">box</span> <span class="o">=</span> <span class="s2">"bento/ubuntu-16.04"</span>
+    <span class="n">node</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">hostname</span> <span class="o">=</span> <span class="s2">"web1"</span>
+    <span class="n">node</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">network</span> <span class="ss">:private_network</span><span class="p">,</span> <span class="ss">ip: </span><span class="s2">"10.0.15.11"</span>
+    <span class="n">node</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">network</span> <span class="s2">"forwarded_port"</span><span class="p">,</span> <span class="ss">guest: </span><span class="mi">80</span><span class="p">,</span> <span class="ss">host: </span><span class="mi">8080</span>
+    <span class="n">node</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">provider</span> <span class="s2">"virtualbox"</span> <span class="k">do</span> <span class="o">|</span><span class="n">vb</span><span class="o">|</span>
+      <span class="n">vb</span><span class="p">.</span><span class="nf">memory</span> <span class="o">=</span> <span class="s2">"1024"</span>
+    <span class="k">end</span>
+<span class="k">end</span></code></pre></div>
+<h3>Which Kernel</h3>
+<p>You'll also notice in the above that I am using <code>bento/ubuntu-16.04</code> as the base kernel. The screencast uses <code>ubuntu/trusty64</code> but I wanted to use xenial. The problem here is that the <code>ubuntu/xenial</code> kernel does not set up the assumed default user/password as <code>vagrant</code> which throws a wrench into some things. Rather than customize it, I just switched to bento and everything works fine.</p>
+<h3>Configuring Nginx</h3>
+<p><strong>note: part of the following section is a copy/paste of my own words originating from <a href="stackoverflow.com/questions/42521316/rails-5-nginx-passenger-cant-serve-static-assets-404?noredirect=1#comment72180338_42521316">here</a></strong></p>
+<p>I am using passenger to serve my app, but letting nginx serve my precompiled assets. I spent a lot of time confused by how to make this work. Here is the config file I am using in <code>/etc/nginx/sites-enabled/default</code></p>
+<div class="highlight"><pre><code class="language-nginx" data-lang="nginx"><span class="k">server</span> <span class="p">{</span>
+        <span class="kn">listen</span> <span class="mi">80</span> <span class="s">default_server</span><span class="p">;</span>
+        <span class="kn">listen</span> <span class="s">[::]:80</span> <span class="s">default_server</span><span class="p">;</span>
+        <span class="kn">root</span> <span class="p">;</span>
+        <span class="kn">index</span> <span class="s">index.php</span> <span class="s">index.html</span> <span class="s">index.htm</span> <span class="s">index.nginx-debian.html</span><span class="p">;</span>
+        <span class="kn">passenger_enabled</span> <span class="no">on</span><span class="p">;</span>
+        <span class="kn">passenger_app_env</span> <span class="s">production</span><span class="p">;</span>
+        <span class="kn">server_name</span> <span class="p">;</span>
+        <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>
+            <span class="c1">#try_files $uri $uri/ =404;
+</span>            <span class="kn">try_files</span> <span class="nv">$uri</span> <span class="nv">$uri</span><span class="n">/</span> <span class="n">/index.php</span><span class="nv">$is_args$args</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="kn">location</span> <span class="p">~</span> <span class="sr">\.php$</span> <span class="p">{</span>
+            <span class="kn">include</span> <span class="nc">snippets/fastcgi-php</span><span class="s">.conf</span><span class="p">;</span>
+            <span class="kn">fastcgi_pass</span> <span class="s">unix:/run/php/php7.0-fpm.sock</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="kn">location</span> <span class="p">~</span> <span class="sr">/\.ht</span> <span class="p">{</span>
+            <span class="kn">deny</span> <span class="s">all</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="kn">location</span> <span class="p">=</span> <span class="n">/favicon.ico</span> <span class="p">{</span> <span class="kn">log_not_found</span> <span class="no">off</span><span class="p">;</span> <span class="kn">access_log</span> <span class="no">off</span><span class="p">;</span> <span class="p">}</span>
+        <span class="kn">location</span> <span class="p">=</span> <span class="n">/robots.txt</span> <span class="p">{</span> <span class="kn">log_not_found</span> <span class="no">off</span><span class="p">;</span> <span class="kn">access_log</span> <span class="no">off</span><span class="p">;</span> <span class="kn">allow</span> <span class="s">all</span><span class="p">;</span> <span class="p">}</span>
+        <span class="kn">location</span> <span class="p">=</span> <span class="s">.(css|gif|ico|jpeg|jpg|js|png)</span>$<span class="s">"</span> <span class="c1"># don't include this line! see below!
+</span>
+        <span class="s">location</span> <span class="p">~</span> <span class="sr">^/h20-initiative(/.\*|$)</span> <span class="p">{</span>
+            <span class="kn">alias</span> <span class="n">/home//unify/current/public</span><span class="nv">$1</span><span class="p">;</span>
+            <span class="kn">passenger_base_uri</span> <span class="n">/h20-initiative</span><span class="p">;</span>
+            <span class="kn">passenger_app_root</span> <span class="n">/home//current/unify</span><span class="p">;</span>
+            <span class="kn">passenger_document_root</span> <span class="n">/home//unify/current/public</span><span class="p">;</span>
+            <span class="kn">passenger_enabled</span> <span class="no">on</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="kn">location</span> <span class="p">~</span> <span class="sr">^/assets/</span> <span class="p">{</span>
+            <span class="kn">expires</span> <span class="s">1y</span><span class="p">;</span>
+            <span class="kn">add_header</span> <span class="s">Cache-Control</span> <span class="s">public</span><span class="p">;</span>
+            <span class="kn">add_header</span> <span class="s">ETag</span> <span class="s">""</span><span class="p">;</span>
+            <span class="kn">break</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span></code></pre></div>
+<p>Here I am pointing requests for <code>/</code> to my Wordpress install (the variable wp['root_dir'] determines this.) and requests to <code>/h20-initiative/*</code> to to my rails app.</p>
+<p>I also ran into a strange problem where static assets in my rails app were not being served. After a good deal of head scratching the Googling around, I was given some advice on how to grep through the nginx log. First I set my nginx log level to <code>debug</code>. To do that, go to <code>/etc/nginx/nginx.conf</code>. Find the line <code>error_log /var/log/nginx/error.log;</code> and change it to <code>error_log /var/log/nginx/error.log debug;</code></p>
+<p>Then I greped through the log. I searched for one of the assets that wasn't being served and found these lines:</p>
+<div class="highlight"><pre><code class="language-nginx" data-lang="nginx"><span class="k">2017/03/01</span> <span class="nf">02</span><span class="p">:</span><span class="mi">02</span><span class="p">:</span><span class="mi">31</span> <span class="s">[debug]</span> <span class="mi">28274</span><span class="c1">#28274: *231 test location: "/"
+</span><span class="mi">2017</span><span class="n">/03/01</span> <span class="nf">02</span><span class="p">:</span><span class="mi">02</span><span class="p">:</span><span class="mi">31</span> <span class="s">[debug]</span> <span class="mi">28274</span><span class="c1">#28274: *231 test location: "robots.txt"
+</span><span class="mi">2017</span><span class="n">/03/01</span> <span class="nf">02</span><span class="p">:</span><span class="mi">02</span><span class="p">:</span><span class="mi">31</span> <span class="s">[debug]</span> <span class="mi">28274</span><span class="c1">#28274: *231 test location: "favicon.ico"
+</span><span class="mi">2017</span><span class="n">/03/01</span> <span class="nf">02</span><span class="p">:</span><span class="mi">02</span><span class="p">:</span><span class="mi">31</span> <span class="s">[debug]</span> <span class="mi">28274</span><span class="c1">#28274: *231 test location: ~ "\.php$"
+</span><span class="mi">2017</span><span class="n">/03/01</span> <span class="nf">02</span><span class="p">:</span><span class="mi">02</span><span class="p">:</span><span class="mi">31</span> <span class="s">[debug]</span> <span class="mi">28274</span><span class="c1">#28274: *231 test location: ~ "/\.ht"
+</span><span class="mi">2017</span><span class="n">/03/01</span> <span class="nf">02</span><span class="p">:</span><span class="mi">02</span><span class="p">:</span><span class="mi">31</span> <span class="s">[debug]</span> <span class="mi">28274</span><span class="c1">#28274: *231 test location: ~ "\.(css|gif|ico|jpeg|jpg|js|png)$"
+</span><span class="mi">2017</span><span class="n">/03/01</span> <span class="nf">02</span><span class="p">:</span><span class="mi">02</span><span class="p">:</span><span class="mi">31</span> <span class="s">[debug]</span> <span class="mi">28274</span><span class="err">#</span><span class="mi">28274</span><span class="p">:</span> <span class="s">*231</span> <span class="s">using</span> <span class="s">configuration</span> <span class="s">"</span><span class="err">\</span><span class="s">.(css|gif|ico|jpeg|jpg|js|png)</span>$<span class="s">"</span></code></pre></div>
+<p>It looks like the block <code>"\.(css|gif|ico|jpeg|jpg|js|png)$"</code> was the matched block and used to determine where to find requests for static assets. The problem is, that's not where those files are! In fact, I don't need to serve any assets from the root directory. I deleted that block, allowing for the intended block to serve my assets.</p>
+<h3>User installed plugins themes and updates.</h3>
+<p>I want my admin users to have permission to install plugins, themes and updates. We only have two admin users and I work closely with them to ensure nothing malicious is installed. We struggled a bit with this ability until I realized that permissions in the WP install were not done correctly. The owner of the process running Nginx needs permission to read and write to the directories. I did this by granting 0770 permission to all files and directories in the wordpress install.</p>
+<h3>Running rails app at sub path</h3>
+<p>The main site will be served from <code>/</code> and the rails app from /h20-initiative. This presents a somewhat tricky problem in how to get urls to point to the right place. For example I have some Javascript that points to an end point in my app:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">json</span><span class="p">(</span><span class="s2">"/places/active"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">activePlaces</span><span class="p">){</span>
+  <span class="c1">// do something with the result</span>
+<span class="p">}</span></code></pre></div>
+<p>This works perfectly fine in development but in production the endpoint is at <code>/h20-initiative/places/active</code>. How do we consolidate this? I <em>could</em> do all of my app development inside of a vagrant box that's running both my Wordpress install and this app. But that's an awful lot of overhead just to solve a name spacing issue when all I'm trying to do is hack on a rails project and ignore the rest. Instead, I just stored the apps' relative path in an environment variable and then prepend it in paths that need it. For example:</p>
+<p>In my Javascript...</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// in the view attach a variable to the window object:</span>
+<span class="err">:</span><span class="nx">javascript</span>
+    <span class="nb">window</span><span class="p">.</span><span class="nx">base_url</span> <span class="o">=</span> <span class="s2">"#{ENV["</span><span class="nx">BASE_URL</span><span class="s2">"]}"</span><span class="p">;</span>
+<span class="c1">// then access it in the javascript</span>
+<span class="nx">d3</span><span class="p">.</span><span class="nx">json</span><span class="p">(</span><span class="nx">base_url</span> <span class="o">+</span> <span class="s2">"/places/active"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">activePlaces</span><span class="p">){</span>
+  <span class="c1">// do something with the result</span>
+<span class="p">}</span></code></pre></div>
+<p>For all of my route helpers I can add the relative path in <code>config/application</code></p>
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">Bundler</span><span class="p">.</span><span class="nf">require</span><span class="p">(</span><span class="o">*</span><span class="no">Rails</span><span class="p">.</span><span class="nf">groups</span><span class="p">)</span>
+<span class="k">module</span> <span class="nn">Unify</span>
+  <span class="k">class</span> <span class="nc">Application</span> <span class="o">&lt;</span> <span class="no">Rails</span><span class="o">::</span><span class="no">Application</span>
+    <span class="c1"># ...</span>
+    <span class="n">config</span><span class="p">.</span><span class="nf">relative_url_root</span> <span class="o">=</span> <span class="no">ENV</span><span class="p">[</span><span class="s2">"BASE_URL"</span><span class="p">]</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></div>
+<p>In scss I can use an erb tag and <code>image_url</code> to reference an image I want for a
+background</p>
+<div class="highlight"><pre><code class="language-scss" data-lang="scss"><span class="nv">$bg-img</span><span class="p">:</span> <span class="s2">"&lt;%= image_url 'cumberlands.jpg' %&gt;"</span><span class="p">;</span>
+<span class="nt">body</span><span class="p">{</span>
+  <span class="nt">background</span><span class="nd">:url</span><span class="o">(</span><span class="err">$</span><span class="nt">bg-img</span><span class="o">)</span><span class="p">;</span>
+  <span class="c1">// ...
+</span><span class="p">}</span></code></pre></div>
+<p>And that's it! So much easier than having to change my development environment!</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=setting up a wordpress/rails vps with ansible&amp;url=/setting-up-a-wordpressrails-vps-with-ansible&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/setting-up-a-wordpressrails-vps-with-ansible"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

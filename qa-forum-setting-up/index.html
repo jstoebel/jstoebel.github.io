@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Q&amp;A forum: setting up | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="keywords" content="site, website, softwware, software developer, python, djangp, ruby, ruby on rails, javascript, frontend, front-end, html5, css3, jquery, react">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/qa-forum-setting-up">
+<meta property="og:title" content=" Q&amp;A forum: setting up | Jacob Stoebel">
+<meta property="og:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Q&amp;A forum: setting up | Jacob Stoebel">
+<meta name="twitter:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/qa-forum-setting-up">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Q&A forum: setting up</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-03-03"> 2016-03-03
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/qa-forum-setting-up#disqus_thread" data-disqus-identifier="/qa-forum-setting-up">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>Following up from my last post, here is a walk through on generating all of the required components for our Q&amp;A forum.</p>
+<h2>Questions</h2>
+<p>First, let's generate all of the stuff we need related to Q&amp;A questions. This will include the controller, model, migration, views and modification of the routes file.</p>
+<h3>QuestionsController</h3>
+<p>The controller handles all of the incoming requests for the resource and renders the appropriate response. Just to get things started let's make our controller able to handle all actions in CRUD.</p>
+<pre><code>$ rails generate controller questions index show new create edit update delete destroy
+  create  app/controllers/questions_controller.rb
+   route  get 'questions/destroy'
+   route  get 'questions/delete'
+   route  get 'questions/update'
+   route  get 'questions/edit'
+   route  get 'questions/create'
+   route  get 'questions/new'
+   route  get 'questions/show'
+   route  get 'questions/index'
+  invoke  haml
+  create    app/views/questions
+  create    app/views/questions/index.html.haml
+  create    app/views/questions/show.html.haml
+  create    app/views/questions/new.html.haml
+  create    app/views/questions/create.html.haml
+  create    app/views/questions/edit.html.haml
+  create    app/views/questions/update.html.haml
+  create    app/views/questions/delete.html.haml
+  create    app/views/questions/destroy.html.haml
+  invoke  rspec
+  create    spec/controllers/questions_controller_spec.rb
+  create    spec/views/questions
+  create    spec/views/questions/index.html.haml_spec.rb
+  create    spec/views/questions/show.html.haml_spec.rb
+  create    spec/views/questions/new.html.haml_spec.rb
+  create    spec/views/questions/create.html.haml_spec.rb
+  create    spec/views/questions/edit.html.haml_spec.rb
+  create    spec/views/questions/update.html.haml_spec.rb
+  create    spec/views/questions/delete.html.haml_spec.rb
+  create    spec/views/questions/destroy.html.haml_spec.rb
+  invoke  helper
+  create    app/helpers/questions_helper.rb
+  invoke    rspec
+  create      spec/helpers/questions_helper_spec.rb
+  invoke  assets
+  invoke    coffee
+  create      app/assets/javascripts/questions.js.coffee
+  invoke    scss
+  create      app/assets/stylesheets/questions.css.scss
+</code></pre>
+<p>This action creates several new files for us:</p>
+<ul>
+<li>The controller itself</li>
+<li>routes for each action we requested</li>
+<li>a new directory of views for the questions resource</li>
+<li>test files for the questions resource</li>
+<li>static assets to be used inside the resource (Coffescript and SCSS)</li>
+</ul>
+<p>The file of most immediate concern is the controller. Taking it a look, it contains all of the actions we specified.</p>
+<pre><code> class QuestionsController &lt; ApplicationController
+  def index
+  end
+  def show
+  end
+  def new
+  end
+  def create
+  end
+  def edit
+  end
+  def update
+  end
+  def delete
+  end
+  def destroy
+  end
+end
+</code></pre>
+<p>These actions won't do anything other than render their appropriate view, but its a good start. Next the routes file:</p>
+<h2>Routes</h2>
+<p>Looking in <code>config/routes.rb</code> we see that new routes were created for us to reach each of these controller actions.</p>
+<pre><code>get 'questions/index'
+get 'questions/show'
+get 'questions/new'
+get 'questions/create'
+get 'questions/edit'
+get 'questions/update'
+get 'questions/delete'
+get 'questions/destroy'
+</code></pre>
+<p>These work ok, but a much better way is to implement <a href="http://guides.rubyonrails.org/routing.html">RESTful routes</a>.  This is preferable because they are 1) easier to organize 2) more concise and 3) provide common sense HTTP verbs for each CRUD action. To implement this, let's delete all of the above and replace it with simply <code>resources :questions</code>. This simple method call creates all of the routes we will likely need to service the questions resource. We can take a look at the actual paths that were added by using <code>rake routes</code></p>
+<pre><code>$ rake routes | grep questions
+   questions_index GET      /questions/index(.:format)                                                                              questions#index
+                             questions_show GET      /questions/show(.:format)                                                                               questions#show
+                              questions_new GET      /questions/new(.:format)                                                                                questions#new
+                           questions_create GET      /questions/create(.:format)                                                                             questions#create
+                             questions_edit GET      /questions/edit(.:format)                                                                               questions#edit
+                           questions_update GET      /questions/update(.:format)                                                                             questions#update
+                           questions_delete GET      /questions/delete(.:format)                                                                             questions#delete
+                          questions_destroy GET      /questions/destroy(.:format)                                                                            questions#destroy
+</code></pre>
+<p>Sweet! Now our app has URLs that will route to the related action in the questions controller.</p>
+<h2>Model</h2>
+<p>Now we need to create the model which is an API for the corresponding database table.</p>
+<pre><code>$ rails generate model Question      invoke  active_record
+  create    db/migrate/20160303224849_create_questions.rb
+  create    app/models/question.rb
+  invoke    rspec
+  create      spec/models/question_spec.rb
+  invoke      factory_girl
+  create        spec/factories/questions.rb
+</code></pre>
+<p>Our model is created. There is a lot we can put in there, but the first thing should be to tell the model how it associates with other models.</p>
+<pre><code>class Question &lt; ActiveRecord::Base
+  has_many :responses
+  belongs_to :user
+  belongs_to :exercise
+end
+</code></pre>
+<p>The Question class now has three additional methods: <code>responses</code>, <code>user</code> and <code>exercise</code> which all grab the records you would expect. With all of this stuff using ActiveRecord we might not need to type SQL at all!</p>
+<h1>Migration</h1>
+<p>This provides a file we can add ruby code to which will add the actual database table. Let's do that now:</p>
+<pre><code>class CreateQuestions &lt; ActiveRecord::Migration
+  def up
+    create_table :questions do |t|
+        t.string :title
+        t.string :body
+        t.string :tags
+        t.integer :user_id
+        t.integer :exercise_id
+        t.timestamps
+    end
+    add_foreign_key :questions, :users
+    add_foreign_key :questions, :exercises
+   end
+  def down
+    drop_table :questions
+  end
+end
+</code></pre>
+<p>This migration file has two methods, <code>up</code> and <code>down</code>. When we are running <code>rake db:migrate</code> the <code>up</code> method will run. When we run <code>rake db:rollback</code> the <code>down</code> method responds. <code>down</code> should always reverse what <code>up</code> does so programmers can move backwards and forwards in the code migrations. With the migration written we can run it:</p>
+<pre><code>$ rake db:migrate
+== 20160303224849 CreateQuestions: migrating ==================================
+-- create_table(:questions)
+   -&gt; 0.0016s
+-- add_foreign_key(:questions, :users)
+   -&gt; 0.0000s
+-- add_foreign_key(:questions, :exercises)
+   -&gt; 0.0000s
+== 20160303224849 CreateQuestions: migrated (0.0018s) =========================
+</code></pre>
+<p>It works! It's not a bad idea to make sure the down method works to.</p>
+<pre><code>$ rake db:rollback
+== 20160303224849 CreateQuestions: reverting ==================================
+-- drop_table(:questions)
+   -&gt; 0.0007s
+== 20160303224849 CreateQuestions: reverted (0.0008s) =========================
+</code></pre>
+<p>Great! Don't forget to migrate back up once you've done this. An important note here is that an actual database table is being dropped meaning that actual data can be lost. No confirmation at all! Fortunately we are not in charge of production data so there isn't a danger for us to worry about.</p>
+<h2>Repeat for responses</h2>
+<p>Repeat all of the above for the responses resource and we have set up our infrastructure.</p>
+<h2>Conclusion</h2>
+<p>It takes a bit of work to get a new part of an app set up, but once we've done so, we are ready to start breaking up the work. You can see the work I've done <a href="https://github.com/jstoebel/code-workout/tree/qa_setup_jacob">here</a></p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Q&A forum: setting up&amp;url=/qa-forum-setting-up&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/qa-forum-setting-up"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

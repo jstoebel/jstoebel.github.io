@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Filing Bugs Like a Pro | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="keywords" content="site, website, softwware, software developer, python, djangp, ruby, ruby on rails, javascript, frontend, front-end, html5, css3, jquery, react">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/filing-bugs-like-a-pro">
+<meta property="og:title" content=" Filing Bugs Like a Pro | Jacob Stoebel">
+<meta property="og:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Filing Bugs Like a Pro | Jacob Stoebel">
+<meta name="twitter:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/filing-bugs-like-a-pro">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Filing Bugs Like a Pro</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-02-11"> 2016-02-11
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/filing-bugs-like-a-pro#disqus_thread" data-disqus-identifier="/filing-bugs-like-a-pro">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>The consensus seems pretty clear from Open Source Developers: many people lack either the ability or will to file actionable bug reports. We&#8217;ve read several resources on how to write good bug reports and there is actually a pretty straight forward template on how bugs should be filed:</p>
+<ol>
+<li><strong>What were you trying to do? </strong>In order to understand the problem, the developer really needs to understand what specific actions you took that lead up to the bug. If you tried to navigate to a site, did you type in the URL or click on a link? What page was that link on? Include as many details as you can: the thing that you <em>think</em> caused the error may not be the cause at all, and may merely have been coincidental.</li>
+<li><strong>What system were you doing it on?</strong> What was the operating system and version? What was the version of the program (if available)? If the program was interacting with another program, what was that program and version?</li>
+<li><strong>What did you expect to happen? </strong>Before you launch into the reporting of the problem, layout what you expected to happen. Sometimes the behavior you experienced is exactly what the developers intended to happen. If that&#8217;s the case, the problem isn&#8217;t an issue of buggy software and rather one of user experience. In either case its good feedback: developers want to make software that is intuitive for users, so if you expected something different, they&#8217;ll want to fix it.</li>
+<li><strong>What happened instead?</strong> Here is where you describe the actual problem. Again, give as much detail as possible. If you can&#8217;t make the program print a report, what specifically <em>did </em>happen? Did you get the print dialogue to come up? Did you get a message saying the job was sent to the printer? Or did you press the print button and simply nothing happened? If the program &#8220;crashed&#8221;, did the program exit to the home screen? Exit completely? Did the computer go completely non responsive? Did your laptop burst into flames? If the program gives any kind of error message, code or report, document it as best as you can. These messages are designed to help developers track down what specifically is going wrong. Also important: does the program happen consistently? Does it happen in a number of different places or in one specific place?</li>
+<li><strong>What else was true when that happened? </strong>Help the developer know as many details as possible about what else was going on with your environment. Did you have a bunch of other programs open at the same time? If audio wouldn&#8217;t play as expected, was anything else utilizing audio output at the time? What about your Internet connection? Has it been spotty lately? Were you connected to WiFi or Ethernet? Off line completely?</li>
+</ol>
+<p>&nbsp;</p>
+<p>All of these details may seem like overkill, but in order for developers to address the problem, they will first need to reproduce it so they can diagnose the problem. As members of open source communities, we will want to be sure to follow these guidelines so as to make a positive contribution to these projects, rather than simply cluttering their Github page and wasting time.</p>
+<p><br />  <a rel="nofollow" href="http://feeds.wordpress.com/1.0/gocomments/jacobstoebel.wordpress.com/861/"><img alt="" border="0" src="http://feeds.wordpress.com/1.0/comments/jacobstoebel.wordpress.com/861/" /></a> <img alt="" border="0" src="https://pixel.wp.com/b.gif?host=jacobstoebel.wordpress.com&#038;blog=104465458&#038;post=861&#038;subd=jacobstoebel&#038;ref=&#038;feed=1" width="1" height="1" /></p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Filing Bugs Like a Pro&amp;url=/filing-bugs-like-a-pro&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/filing-bugs-like-a-pro"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

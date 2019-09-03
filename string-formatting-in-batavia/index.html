@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> string formatting in Batavia | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="string formatting in Batavia">
+<meta name="keywords" content="">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/string-formatting-in-batavia">
+<meta property="og:title" content=" string formatting in Batavia | Jacob Stoebel">
+<meta property="og:description" content="string formatting in Batavia">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" string formatting in Batavia | Jacob Stoebel">
+<meta name="twitter:description" content="string formatting in Batavia">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/string-formatting-in-batavia">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>string formatting in Batavia</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-12-22"> 2016-12-22
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/string-formatting-in-batavia#disqus_thread" data-disqus-identifier="/string-formatting-in-batavia">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>For the last few weeks I have attempted to crack Python's <a href="https://docs.python.org/2/library/stdtypes.html#string-formatting">old style string formatting</a>. A rudimentary version already exists in Batavia, but numerous features and corner cases are not yet implemented. I wanted to try to <a href="https://github.com/pybee/batavia/pull/391">round things out a little bit more.</a></p>
+<h2>plan 1: parse using a regex</h2>
+<p>The current implementation of this functionality uses a long regex to parse each specifier after a few hours of trying to build off of the existing regex and getting no further, I decided this would be an unwise approach. There is a great deal of complexity in this system that it makes my head hurt just to think about. Instead I'm going to have to rewrite everything to handle all of the complexity.</p>
+<h2>plan 2: rewrite everything</h2>
+<h3>detecting possible specifiers</h3>
+<p>If we can't write a regex to parse each specifier, we can at least write a regex to detect <em>possible</em> specifiers. The much simpler regex <code>/(%.+?)(\s|$)/</code> will give me each possible specifier in the format string. From there I can run them through a function for processing/validation.</p>
+<p>By the way, I had initially written a generator using <code>function*</code> syntax to abstract this functionality. It turns out when I went to run tests that Webpack didn't take too kindly to this. I could have invested more time figuring out why and how to fix it, but instead I decided to reimplement as a simple while loop.</p>
+<h3>Parsing/validating possible specifiers</h3>
+<p>From there, I need to parse the possible specifier. The bad news is that tokens in specifiers are not modular, meaning that the meaning/validity of each token is affected by what comes before and after both within the same specifier and later in the expression. I need to iterate over the entire specifier to figure out what's going on and then assuming nothing's wrong, go over it again to do the substitution. Specifically this means a <code>Specifier</code> object which will.</p>
+<ol>
+<li>Determine if any conversion flags will be used. Some flags override others, so logic needs to be in place to catch this.</li>
+<li>Logic to determine what stage of the parsing we are in. The character <code>#</code> is legal, but not if it comes after an integer for example. I implemented a function called <code>getNextStep</code> which tells me what stage of processing should happen with the next character seen.</li>
+<li>Determine minimum field width and precision. Things are made even <em>more</em> complex by the fact that instead of passing in integers you can also pass a <code>*</code> meaning that the value will be determined by the next argument passed. This means that...</li>
+<li>As a specifier is being parsed, I also have to pass in an array of all available unused arguments. When we find a place where an argument is needed grab one off the array and save it to the object. If not enough arguments are available throw an error in the appropriate way (and yes, the error depends on context.)</li>
+<li>Finally, once everything is parsed, circle back and have the <code>Specifier</code> object perform the substitution. Here there are numerous places where special handling is needed such as places where white space or leading/trailing 0s must be tacked on, positive/negative signs must be added and so much more. Its a dance of converting things between <code>Number</code> and <code>String</code> <code>split</code>ing and <code>join</code>ing, adding extra decimal places and on and on and on...</li>
+</ol>
+<p>As of this writing (12/22/16), my current draft comes in over 500 lines of JavaScript though it still needs to be cleaned up, rotten code and comments removed, better comments added etc. I also have a skeleton for unit tests, though they aren't all passing yet (see below).</p>
+<h2>TODO</h2>
+<ol>
+<li>This iteration doesn't handle key word arguments. I still need to add this.</li>
+<li>I have not yet worked out how to handle a literal <code>%</code>. For example. This shouldn't be <em>too</em> hard.</li>
+</ol>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="o">&gt;&gt;&gt;</span> <span class="s">"</span><span class="si">%</span><span class="s">s </span><span class="si">%%</span><span class="s">s"</span> <span class="o">%</span> <span class="s">'s'</span>
+<span class="s">'s </span><span class="si">%</span><span class="s">s'</span></code></pre></div>
+<ol>
+<li>I have run into a very strange problem where when I have anything that returns a string like <code>3.000</code>, the string is reduced to <code>3.0</code>. Given that the user needs to be able to specify a precision in decimal numbers, this won't work. I tried firing up a regular script that I run through node and this issue doesn't emerge, but I <em>do</em> see it when running the tests, leaving me to wonder if Webpack may be the culprit.</li>
+<li>Further work on tests to ensure we're covering everything.</li>
+<li>Clarify code with comments, delete rotten code and comments.</li>
+<li>Don't believe <a href="https://twitter.com/PyBeeWare/status/812114406230216704">this sign</a></li>
+</ol>
+<h2>Update</h2>
+<p>I found the problem with truncating string representations of floats. After poking around in the webpack build a little more, it turns out this wasn't the culprit at all. There is a function in the <code>test/utils.py</code> called <code>cleanse_javascript</code>. Part of this function looks for any string representation of a float, converts it to a float then back to a string again. Goodbye extra decimals! We'll need some kind of special handling to distinguish between strings and floats.</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=string formatting in Batavia&amp;url=/string-formatting-in-batavia&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/string-formatting-in-batavia"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

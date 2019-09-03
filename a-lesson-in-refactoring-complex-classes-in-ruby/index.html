@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> A Lesson in Refactoring Complex Classes in Ruby | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="A Lesson in Refactoring Complex Classes in Ruby">
+<meta name="keywords" content="">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/a-lesson-in-refactoring-complex-classes-in-ruby">
+<meta property="og:title" content=" A Lesson in Refactoring Complex Classes in Ruby | Jacob Stoebel">
+<meta property="og:description" content="A Lesson in Refactoring Complex Classes in Ruby">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" A Lesson in Refactoring Complex Classes in Ruby | Jacob Stoebel">
+<meta name="twitter:description" content="A Lesson in Refactoring Complex Classes in Ruby">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/a-lesson-in-refactoring-complex-classes-in-ruby">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>A Lesson in Refactoring Complex Classes in Ruby</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2018-08-30"> 2018-08-30
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/a-lesson-in-refactoring-complex-classes-in-ruby#disqus_thread" data-disqus-identifier="/a-lesson-in-refactoring-complex-classes-in-ruby">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>I have always loved the act of refactoring, especially in Ruby. Its a fun puzzle to solve and the reward at the end is code that's easier to read and maintain.</p>
+<p>One thing I've spent a time refactoring is when a classes' private methods become so complex, that it becomes hard to test and reason about. What started as a simple class with a simple interface begins to feel more like an iceberg: looks simple from the outside, but tons more under the surface. We might be tempted to not worry about a growing collection of private methods. "So long as the right output happens in the end, we're fine!" we say to out selves. The issue there is with testability: If I want to consider all of the corner cases and gotchas that could go wrong while "under the surface", I need to set up those corner cases using the public interface. Suddenly my unit tests on this classes start to feel like more like integration tests: give an input to one part of the system and observe the reaction in another part of the system. When different parts of a class start to feel like they aren't one things but two (or even three, four or more), that's when I know its time to start refactoring.</p>
+<p>Let's consider a class that's responsible for getting some data from a remote server. Its going to run a command over ssh which will result in a file on the remote machine being created. Depnding on the reuslt of that ssh command the class then <code>scp</code>s the file down and then removes the remote file over ssh to clean things up. I'm going to omit the implementation of the methods since its not important for this example.</p>
+<pre><code>class CopyDb
+  def initialize
+  end
+  def perform
+    dump_output =_ssh 'rake db:backup'
+    raise unless output_ok? dump_output
+    _scp_file
+    delete_output = _ssh 'rm filename.txt'
+    raise unless output_ok? delete_output
+  end
+  private
+  # issues command over ssh to the configured server, returns the remote output
+  def _ssh(command)
+    ...
+  end
+  # parses output from a remote ssh session, returns true if exited with code 0
+  def output_ok?(remote_output)
+    ...
+  end
+  # parses remote output to determine the created file name and returns that name
+  def remote_file_name(remote_output)
+  end
+  # pull down the expected file, raise an error if there was a problem
+  def _scp_file
+    ...
+  end
+end
+</code></pre>
+<p>This of course is a very simplified version of what this class would actually look like, but as I was working on it, and trying to write the tests things started getting hairy. I of course didn't want to actually have my tests hit the remote server, but to test all of the possible outcomes I need to set up the appropriate stubbed output in each test. This quickly started to feel tedious. I realized that I was trying to represent two things (the copying of the database and the remote server) in one class. What if I set up a new class called <code>Server</code> that acted as a collaborator class and handled all of the interactions with the remote server? It would provide two public methods <code>ssh</code> and <code>scp</code> and would return a <code>Struct</code> represnting the remote output and if it exited with out error:</p>
+<pre><code># frozen_string_literal: true
+require 'ostruct'
+# class that encapsulates all interactions with the remote server
+class Server
+  # username(string): the remote username for the server
+  # host(string): the host name for the server
+  # project_root(string): the name of the project directory where remote operations will be performed
+  def initialize(username, host, project_name)
+    @username = username
+    @host = host
+    @project_name = project_name
+    @project_root = "/web/project/#{project_name}/current"
+  end
+  # perform a command over ssh at the @project_root directory
+  # cmd(string): the remote command to execute
+  # returns output of the command plus the exit code on the remote process
+  def ssh(cmd)
+    full_cmd = "cd #{@project_root} &amp;&amp; #{cmd}; echo $?"
+    raw_output = _ssh full_cmd
+    _parsed_results raw_output
+  end
+  # retrieve a file via scp command located at @project_root
+  # and place it (same name) in pwd
+  # raises error when failed
+  # returns nil
+  def scp(file_name)
+    full_file_path = "#{@project_root}/#{file_name}"
+    _scp file_name, full_file_path
+  end
+  private
+  # handles the ssh call
+  def _ssh(full_command)
+    `ssh #{@username}@#{@host} '#{full_command}' 2&gt;&amp;1`
+  end
+  # output (string): the output from the remote server
+  def _parsed_results(output)
+    remote_command_ok = output.split("\n").last == '0'
+    OpenStruct.new output: output, success: remote_command_ok
+  end
+  def _scp(file_name, full_file_path)
+    Net::SCP.download!(
+      @host,
+      @username,
+      full_file_path,
+      "./#{file_name}"
+    )
+  end
+end
+</code></pre>
+<p>Now, we have a better seperation of concerns. The <code>CopyDb</code> class handles the processing of information and a collaborating instance of the <code>Server</code> class is how we interact with the remote server. The biggest pay off for me was with testability. Now I can write unit tests to ensure a <code>Server</code> can do its job correctly, and then when I want to test <code>CopyDb</code> I only need to ensure that the correct inputs are passed to the collaborating <code>Server</code>. Better seperation of concerns == refactoring win!</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=A Lesson in Refactoring Complex Classes in Ruby&amp;url=/a-lesson-in-refactoring-complex-classes-in-ruby&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/a-lesson-in-refactoring-complex-classes-in-ruby"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

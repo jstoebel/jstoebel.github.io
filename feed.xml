@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Jacob Stoebel | Software Developer</title>
+    <description>Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.</description>
+    <link>/</link>
+    <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 03 Sep 2019 06:39:26 -0400</pubDate>
+    <lastBuildDate>Tue, 03 Sep 2019 06:39:26 -0400</lastBuildDate>
+    <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>Starting Again: Pomodoro App 2</title>
+        <description>&lt;p&gt;One thing I am learning about learning is that there is value in qutting. In my pomodoro project I was encountering a lot of trouble with Apollo. Not so much with the technology itself , so much as I was having trouble finding answers to my problems along the way. Feeling frustrated, I took a step back to look at my priorities which are:&lt;/p&gt; &lt;ul&gt; &lt;li&gt;to get some experience building something a little more complicated (but still resonable given my busy schedule)&lt;/li&gt; &lt;li&gt;to get my hands dirty with Typescript&lt;/li&gt; &lt;/ul&gt; &lt;p&gt;While it was fun to also get my hands dirty...</description>
+        <pubDate>Wed, 31 Oct 2018 16:49:56 +0000</pubDate>
+        <link>/starting-again-pomodoro-app-2</link>
+        <guid isPermaLink="true">/starting-again-pomodoro-app-2</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Diving into Typescript</title>
+        <description>&lt;p&gt;I have a confession: I think I like Typescript.&lt;/p&gt; &lt;p&gt;As someone coming from the world of dynamic languages, I&#39;ve sort of just assumed that I preferred getting to avoid the ceremony of declaring types as they are created, passed into and returned from functions. I say assumed because apart from a short experience learning c++ (didn&#39;t go well) I don&#39;t really have much experience with strictly typed languages. For all of my career as a developer so far, I&#39;ve been fine with this lack of knowledge. From the early does as a beginner you get used to the kinds of...</description>
+        <pubDate>Mon, 17 Sep 2018 15:48:44 +0000</pubDate>
+        <link>/diving-into-typescript</link>
+        <guid isPermaLink="true">/diving-into-typescript</guid>
+        
+        <category>Typescript</category>
+        
+        <category>Apollo</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>A Lesson in Refactoring Complex Classes in Ruby</title>
+        <description>&lt;p&gt;I have always loved the act of refactoring, especially in Ruby. Its a fun puzzle to solve and the reward at the end is code that&#39;s easier to read and maintain.&lt;/p&gt; &lt;p&gt;One thing I&#39;ve spent a time refactoring is when a classes&#39; private methods become so complex, that it becomes hard to test and reason about. What started as a simple class with a simple interface begins to feel more like an iceberg: looks simple from the outside, but tons more under the surface. We might be tempted to not worry about a growing collection of private methods. &quot;So long...</description>
+        <pubDate>Thu, 30 Aug 2018 10:51:05 +0000</pubDate>
+        <link>/a-lesson-in-refactoring-complex-classes-in-ruby</link>
+        <guid isPermaLink="true">/a-lesson-in-refactoring-complex-classes-in-ruby</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Automating Some Of My Regular Workflows With Ruby</title>
+        <description>&lt;p&gt;At my day job, I maintain dozens of different rails projects for various clients. One thing I need do to frequently throughout my day is deploy projects, both to staging and production. We use capistrano to handle all of our deployments, but sometimes just the command to kick things off can be too much typing/thinking. For example this is typically the command I use to deploy a project to staging&lt;/p&gt; &lt;pre&gt;&lt;code&gt;BRANCH=&#39;some_branch&#39; bundle exec cap staging deploy:clobber_npm deploy:clobber_lock deploy; &lt;/code&gt;&lt;/pre&gt; &lt;p&gt;After doing some thinking I realized, &lt;em&gt;this is a lot of typing for what amounts to the same thing over and...</description>
+        <pubDate>Wed, 29 Aug 2018 16:42:01 +0000</pubDate>
+        <link>/automating-some-of-my-regular-workflows-with-ruby</link>
+        <guid isPermaLink="true">/automating-some-of-my-regular-workflows-with-ruby</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Jumping Back In: My New Side Project</title>
+        <description>&lt;p&gt;Since my son was born last Spring, I&#39;ve been pretty much heads down on 1) taking care of him with my wife and 2) trying to do well in my new job with ePublishing. There hasn&#39;t been a whole lot of time for side projects / outside learning. That will be changing though.&lt;/p&gt; &lt;p&gt;Thanks to an incredibly supportive wife and some creativity with my schedule, I am devoting some time to growing as a developer. Some of my goals:&lt;/p&gt; &lt;ul&gt; &lt;li&gt;Get some experience building a more complex project form the ground up. This means choosing the entire tech stack considering...</description>
+        <pubDate>Fri, 03 Aug 2018 12:58:18 +0000</pubDate>
+        <link>/jumping-back-in-my-new-side-project</link>
+        <guid isPermaLink="true">/jumping-back-in-my-new-side-project</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Deplying a Rails Applicaiton to AWS with Docker  Part 1</title>
+        <description>&lt;h1&gt;setting up dev enviornment&lt;/h1&gt; &lt;ul&gt; &lt;li&gt;followed this tutorial: https://docs.docker.com/compose/rails/&lt;/li&gt; &lt;li&gt;need to mount my host system to get at source code:&lt;/li&gt; &lt;li&gt;needed to persist postgres data back to host system once container is finished.&lt;/li&gt; &lt;li&gt;rake task to start up&lt;/li&gt; &lt;li&gt;need to point at the &lt;code&gt;docker-compose.yml&lt;/code&gt; and give correct build context&lt;/li&gt; &lt;/ul&gt; &lt;p&gt;I&#39;ve been working with Docker and Rails for a bit now and really love it. It makes for huge wins both in terms of setting up your development environment and deploying to AWS, but the steps to get started aren&#39;t always obvious. That&#39;s why I decided to document my steps...</description>
+        <pubDate>Sat, 02 Dec 2017 12:55:08 +0000</pubDate>
+        <link>/deplying-a-rails-applicaiton-to-aws-with-docker--part-1</link>
+        <guid isPermaLink="true">/deplying-a-rails-applicaiton-to-aws-with-docker--part-1</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Mocks with Sinon.js</title>
+        <description>&lt;p&gt;My &lt;a href=&quot;https://github.com/jstoebel/nightlife&quot;&gt;nightlife app&lt;/a&gt; app makes use of a few external services in production. This presents some tricky problems when we are trying to test the code. Do I really want my test suite to have to hit the Yelp api during tests? Common advice is that we want to create a dependable, consistent testing environment. This means that we shouldn&#39;t be hitting external services during tests. So what do we do. Enter mocks! I wrote a bit about mocks in &lt;a href=&quot;/a-no-frills-jump-into-fakes-mocks-and-stubs&quot;&gt;earlier post&lt;/a&gt; but I wanted to take a minute to dive in a little deeper with some examples...</description>
+        <pubDate>Thu, 10 Aug 2017 16:09:45 +0000</pubDate>
+        <link>/mocks-with-sinonjs</link>
+        <guid isPermaLink="true">/mocks-with-sinonjs</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Using react leaflet</title>
+        <description>&lt;p&gt;For my new &lt;a href=&quot;https://github.com/jstoebel/nightlife&quot;&gt;nightlife app&lt;/a&gt; I am using &lt;a href=&quot;http://leafletjs.com/&quot;&gt;&lt;code&gt;leaflet.js&lt;/code&gt;&lt;/a&gt; to handle marking search results on a map. Leaflet was an immediate win for this project because so much comes, basically for free right out of the box: you get beautiful looking maps, markers, and pop ups with hardly anything to configure. What could be better? Oh I know, how about wrapping this functionality in React components! That way I can render a series of markers on a map with something like:&lt;/p&gt; &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-jsx&quot; data-lang=&quot;jsx&quot;&gt;&amp;lt;Map bounds={this.state.corners}&amp;gt; &amp;lt;TileLayer url=&#39;http://{s}.tile.osm.org/{z}/{x}/{y}.png&#39; attribution=&#39;&amp;amp;copy; &amp;lt;a href=&quot;http://osm.org/copyright&quot;&amp;gt;OpenStreetMap&amp;lt;/a&amp;gt; contributors&#39; /&amp;gt; {this.props.results.map(this._eachBar)} &amp;lt;/Map&amp;gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt; &lt;p&gt;Neato! There are...</description>
+        <pubDate>Thu, 10 Aug 2017 15:10:57 +0000</pubDate>
+        <link>/using-react-leaflet</link>
+        <guid isPermaLink="true">/using-react-leaflet</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Honesty, Kindness and Inspiration: Pick Three</title>
+        <description>&lt;p&gt;Folks, we need to talk about a tweet:&lt;/p&gt; &lt;blockquote class=&quot;twitter-tweet&quot; data-lang=&quot;en&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Code review can be:&lt;br&gt;&lt;br&gt;• honest&lt;br&gt;• nice&lt;br&gt;&lt;br&gt;Pick one...&lt;/p&gt;&amp;mdash; I Am Devloper (@iamdevloper) &lt;a href=&quot;https://twitter.com/iamdevloper/status/864410644732313600&quot;&gt;May 16, 2017&lt;/a&gt;&lt;/blockquote&gt; &lt;p&gt;As far as I can tell, this seems to be the attitude among many developers: I can either 1) give you feedback that is touchy feely and makes you feel good but is useless or 2) We can get some &lt;strong&gt;real&lt;/strong&gt; work done but I will make you feel like garbage. The Tweet received several objections from people wondering aloud why feedback can&#39;t be both honest &lt;strong&gt;and&lt;/strong&gt; kind.&lt;/p&gt; &lt;p&gt;In a past life, I...</description>
+        <pubDate>Tue, 23 May 2017 08:16:56 +0000</pubDate>
+        <link>/honesty-kindness-and-inspiration-pick-three</link>
+        <guid isPermaLink="true">/honesty-kindness-and-inspiration-pick-three</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Upgrading the EDS Dashobard to Rails 5</title>
+        <description>&lt;p&gt;Rails has dropped active support for Rails 4.2 which means its time to bite the bullet and upgrade the &lt;a href=&quot;https://github.com/jstoebel/eds_dashboard&quot;&gt;EDS Dashboard&lt;/a&gt; from 4.2 to 5. Here&#39;s a summary of some of the sticky points in that process:&lt;/p&gt; &lt;h1&gt;Dependency tidying&lt;/h1&gt; &lt;p&gt;As expected, one top level dependency (&lt;code&gt;sass-rails&lt;/code&gt;) was on old version and not allowing &lt;code&gt;active_record == 5.0.0&lt;/code&gt;. Fortunately it is well supported and has a Rails 5 version. Easy. In this process we also identified a few dependencies we aren&#39;t using anywhere. Goodbye to &lt;code&gt;seed_dump&lt;/code&gt;, &lt;code&gt;composite_primary_keys&lt;/code&gt;, &lt;code&gt;active_record-acts_as&lt;/code&gt;&lt;/p&gt; &lt;h1&gt;&lt;code&gt;rails app:update&lt;/code&gt;&lt;/h1&gt; &lt;p&gt;This script was a big help in changing the config files....</description>
+        <pubDate>Tue, 18 Apr 2017 12:29:08 +0000</pubDate>
+        <link>/upgrading-the-eds-dashobard-to-rails-5</link>
+        <guid isPermaLink="true">/upgrading-the-eds-dashobard-to-rails-5</guid>
+        
+        
+      </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Creating a new exercise on CodeWorkout-Part 2 | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="keywords" content="site, website, softwware, software developer, python, djangp, ruby, ruby on rails, javascript, frontend, front-end, html5, css3, jquery, react">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/creating-a-new-exercise-on-codeworkout-part-2">
+<meta property="og:title" content=" Creating a new exercise on CodeWorkout-Part 2 | Jacob Stoebel">
+<meta property="og:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Creating a new exercise on CodeWorkout-Part 2 | Jacob Stoebel">
+<meta name="twitter:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/creating-a-new-exercise-on-codeworkout-part-2">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Creating a new exercise on CodeWorkout-Part 2</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-02-06"> 2016-02-06
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/creating-a-new-exercise-on-codeworkout-part-2#disqus_thread" data-disqus-identifier="/creating-a-new-exercise-on-codeworkout-part-2">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>Note: this post is a continuation of this post</p>
+<h3>TL;DR</h3>
+<p>CodeWorkout does not yet have a UI for faculty to add a new exercise. In this blog post I will walk you though how to create a new coding exercise from the rails console. The purpose here is more to understand how it works. Let's not waste time entering questions this way when we actually go to contribute questions!</p>
+To get started, make sure you are in the root of the app and typerails console  or simple <code>rails c</code>  for short. This will bring up the rails console which allows us to issue Ruby command against our Rails environment.</p>
+<h3>Exercise</h3>
+<p>Records in the exercises table of the database are represented by ActiveRecord as a Ruby class called <code>Exercise</code>. Let's create a new one now:</p>
+<pre><code>irb(main):001:0&amp;gt; ex = Exercise.new
+=&gt; #Exercise id: nil, question_type: nil, current_version_id: nil, created_at: nil, updated_at: nil, versions: nil, exercise_family_id: nil, name: nil, is_public: false, experience: nil, irt_data_id: nil, external_id: nil&gt;
+</code></pre>
+<p>We've just created a new Exercise instance. Its not in the database yet (how could it, it has no attributes including an id). What should we assign to these fields?</p>
+<ul>
+<li><strong>id</strong>: This is the primary key of the record, meaning that it is how we reference the record uniquely. It is also auto incrementing, meaning that the database will simply give it an arbitrary number when we save it to the database. We don&#8217;t need to put anything here.</li>
+<li><p><strong>question_type:</strong> CodeWorkout allows for several types of questions such as coding and multiple choice. If we look in the exercise model we see the following.</p>
+<pre><code>  Q_MC = 1
+  Q_CODING = 2
+  Q_BLANKS = 3
+  TYPE_NAMES = {
+  Q_MC = 'Multiple Choice Question'
+  Q_CODING = 'Coding Question'
+  Q_BLANKS ='Fill in the blanks'
+  }
+</code></pre></li>
+</ul>
+<p>We want to make a coding question so let's type <code>ex.question_type = 2</code>.</p>
+<ul>
+<li><strong>current_version_id</strong> Each exercise is allowed to have multiple versions which are kept in a table exercise_versions. The most current version
+is referenced here. We'll leave it blank for now, but before we can commit this record we need to create an exercise_version and then reference it here.</li>
+<li><strong>created_at and updated_at </strong>
+These fields simply represent when the record was made and last updated. The database will handle filling and updating the time stamps here. We can leave them as nil.</li>
+<li><strong>versions</strong> How many versions of this exercise there are. Let’s enter <code>ex.versions = 1</code><em>   <strong>exercise_family_id</strong> Each exercise can belong to a family of exercises, but doesn’t have to. Looking at the records in exercise_familes table (<code>ExerciseFamily.all</code>) we see no records. Let’s skip this for the time being.</em>   <strong>name</strong> That’s an easy one: simply the name of the exercise. Let’s call it <code>ex.name = "Hello, Python!"</code><em>   <strong>is_public</strong><br/>
+If this exercise should be made public. We can type <code>ex.is_public = true</code> but the record will actually default to this when we save it. How do we know? Looking at the model file <code>exercise.rb</code> we see the following before_validation :set_default</em>   This means that before a record is validated (and all records must be first validated before the are saved to the database, rails should run the method set_defaults). Scrolling to the bottom of the file we see this method definition: def set_defaults # Update current_version if necessary if !self.current_version self.current_version = self.exercise_versions.first endself.question_type ||= (current_version &amp;&amp; current_version.prompts.first) ? current_version.question_type : Q_MC self.name ||= ” self.is_public ||= true self.experience ||= 10 end On line 212 we see that rails will set is_public to true if the value is currently nil (that’s what ||= means; assign it if its nil)<em>   <strong>experience</strong> How much experience should the user gain if they answer correctly? Defaults to 10.</em>   <strong>rt_data</strong> I’m not sure what this is yet, but I think it has something to do with the model irt_data.rb. I’m skipping it for now and will come back to it later*   <strong>external_id</strong> Again, not sure what it is just yet. Skipping for the moment.</li>
+</ul>
+<p>Go ahead and save the exercise by type <code>ex.save</code> If <code>true</code> is returned, the record has been successfully saved to the database.</p>
+<h2>ExerciseVersion</h2>
+<p>We’re almost done making an <code>Exercise</code> record. Next we need to make an ExerciseVersion and associate it with the exercise. Let’s jump over to that that model in <code>exercise_version.rb</code>. Let’s also make a new instance. In the console type</p>
+<pre><code>irb(main):016:0&gt; ex_ver = ExerciseVersion.new  
+=&gt; #&lt;ExerciseVersion id: nil, stem_id: nil, created_at: nil, updated_at: nil,     exercise_id: nil, version: nil, creator_id: nil, irt_data_id: nil&gt;`
+</code></pre>
+<p>Let’s walk through the fields of this record</p>
+<ul>
+<li><strong>id</strong> Auto-incrementing primary key. Leave it alone!</li>
+<li><strong>stem_id</strong> If we peek in the stem.rb file we see the description: “Represents the stem, or preamble, for an exercise.” Let’s skip it for now just for the sake of simplicity.</li>
+<li><strong>created_at and updated_at</strong> Skip! (see above)</li>
+<li><strong>exercise_id</strong> This is the id referencing the exercise record.<br/>
+Assign this version to our exercise by sticking its id into this field. <code>ex_ver.exercise_id = ex.id</code></li>
+<li><strong>version</strong> Which version is this? Its 1 so <code>ex_ver = 1</code></li>
+<li><strong>creator_id and irt_data_id</strong> Skipping these for the moment!</li>
+</ul>
+<p>We’re ready to save this version. Type <code>ex_ver.save</code></p>
+<h2>Prompt and CodingPrompt</h2>
+<p>Our exercise is chugging along but its missing some content. Namely, the actual question we want to ask, along with any code to give the user and some other key attributes. For coding questions, those attributes are stored in <code>CodingPrompt</code> and its psudo base class <code>Prompt</code>. Its a little complicated but the basic idea is that all exercises, regardless of their type share some common attributes. Those attributes are stored in the Prompt class. However a coding exercise has specific attributes that don’t make sense for a multiple choice question, these attributes are found in the <code>CodingPrompt</code> exercise. CodeWorkout uses a gem called acts_as which allows attributes of the Prompt class be accessed directly by the <code>CodingPrompt</code> class. Let’s make a new <code>CodingPrompt</code> record and associate it with out <code>ExerciseVersion</code>.</p>
+<pre><code>irb(main):041:0&gt; cd_pmt = CodingPrompt.new   
+=&gt; #&lt;CodingPrompt id: nil, created_at: nil, updated_at: nil, class_name: nil, wrapper_code: nil, test_script: nil, method_name: nil, starter_code: nil&gt;  
+</code></pre>
+<p><code>CodingPrompt</code> doesn’t look like much but remember that it also knows about all of the attributes that <code>Prompt</code> knows about. Let’s look at both of them.</p>
+<ul>
+<li><strong>id</strong> Auto-incrementing PK. Leave it alone!</li>
+<li><strong>exercise_version_id</strong> The <code>ExerciseVersion</code> this prompt will reference.<br/>
+<code>cd_pmt.exercise_version_id = ex_ver.id</code></li>
+<li><strong>question</strong> This the simply the question to ask the user<br/>
+<code>cd_pmt.question = "print the phrase 'Hello, World!'" to the screen</code></li>
+<li><strong>position</strong> a question can have multiple prompts. For simplicity, ours will just have one so leave it blank.</li>
+<li><strong>feedback</strong> Feedback that gets displayed to the user. Leave blank for this example!</li>
+<li><strong>actable_id</strong> skip! It will be automatically assigned.</li>
+<li><p><strong>actable_type</strong> What kind of prompt is this prompt “acting as”. For this one I looked at an existing CodingPrompt.</p>
+<pre><code>irb(main):062:0&gt; CodingPrompt.first.actable_type  
+SQL (0.7ms) SELECT "coding_prompts"."id" AS t0_r0, "coding_prompts"."created_at" AS t0_r1, "coding_prompts"."updated_at" AS t0_r2, "coding_prompts"."class_name" AS t0_r3, "coding_prompts"."wrapper_code" AS t0_r4, "coding_prompts"."test_script" AS t0_r5, "coding_prompts"."method_name" AS t0_r6, "coding_prompts"."starter_code" AS t0_r7, "prompts"."id" AS t1_r0, "prompts"."exercise_version_id" AS t1_r1, "prompts"."question" AS t1_r2, "prompts"."position" AS t1_r3, "prompts"."feedback" AS t1_r4, "prompts"."created_at" AS t1_r5, "prompts"."updated_at" AS t1_r6, "prompts"."actable_id" AS t1_r7, "prompts"."actable_type" AS t1_r8, "prompts"."irt_data_id" AS t1_r9 FROM "coding_prompts" LEFT OUTER JOIN "prompts" ON "prompts"."actable_id" = "coding_prompts"."id" AND "prompts"."actable_type" = 'CodingPrompt' ORDER BY "coding_prompts"."id" ASC LIMIT 1  
+=&gt; "CodingPrompt"
+</code></pre>
+<p>We should call this prompt a <code>CodingPrompt</code> type `cd_pmt.actable_type = "CodingPrompt"</p></li>
+<li><p><strong>irt_data_id</strong> Skip for this example.</p></li>
+<li><strong>class_name</strong> If we wanted our code to include a class name we would put it here. Since we are making a simple Hello, World in python we don’t need any classes. Leave blank!</li>
+<li><strong>wrapper_code</strong><br/>
+Haven’t figured out what this is for yet, but it is required. Just give it something random like <code>cd_pmt.wrapper_code = "spamspamspam"</code></li>
+<li><strong>test_script</strong><br/>
+The code that should run to test that the user entered the right answer. We need to enter something, but let’s not worry about entering a valid test. Just enter <code>cd_pmt.test_script = "testing123"</code></li>
+<li><strong>method_name</strong> If we are assigning a method to this assignment what should it be called? We can skip cause this is Python!</li>
+<li><strong>starter_code</strong> If we want to start the user off with some code to work from put it here. I think the user can figure it out on their own, so let’s leave this blank.</li>
+</ul>
+<p>We should be ready to save our record now. Type <code>cd_pmt.save</code>. And by the way. If you ever type <code>.save</code> and get <code>false</code> it means the record wasn’t saved. To see why type <code>object.errors.full_messages</code>. This will display all of the reasons why your record can’t be saved. Correct them and try to save again.</p>
+<h2>Test it out!</h2>
+<p>Now let’s fire up our rails server (<code>rails s</code>) and visit <code>[http://localhost:3000](http://localhost:3000)</code>. Login as admin (credentials provided in the README.doc) and visit Gym -> exercises -> browse all. Our exercise should be a the bottom!</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Creating a new exercise on CodeWorkout-Part 2&amp;url=/creating-a-new-exercise-on-codeworkout-part-2&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/creating-a-new-exercise-on-codeworkout-part-2"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

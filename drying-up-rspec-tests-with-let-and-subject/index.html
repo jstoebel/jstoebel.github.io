@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> DRYing up Rspec tests with let and subject | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="keywords" content="site, website, softwware, software developer, python, djangp, ruby, ruby on rails, javascript, frontend, front-end, html5, css3, jquery, react">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/drying-up-rspec-tests-with-let-and-subject">
+<meta property="og:title" content=" DRYing up Rspec tests with let and subject | Jacob Stoebel">
+<meta property="og:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" DRYing up Rspec tests with let and subject | Jacob Stoebel">
+<meta name="twitter:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/drying-up-rspec-tests-with-let-and-subject">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>DRYing up Rspec tests with let and subject</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-04-12"> 2016-04-12
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/drying-up-rspec-tests-with-let-and-subject#disqus_thread" data-disqus-identifier="/drying-up-rspec-tests-with-let-and-subject">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>The Ruby/Rails community is a bit obsessed with DRY (Don't Repeat Yourself). And for good reason! Less typing means fewer chances of error and easier maintainability. This is especially evident in the Rspec, one of the leading testing frameworks for rails.</p>
+<p>Let's take a look an an actual spec that I've been working on for the questions controller:</p>
+<pre><code>describe "POST destroy success" do
+  #should be able to destroy when the post belongs to you
+  #or if you are an admin
+  ControllerMacros::ALL_ROLES.each do |r|
+    context "as #{r}" do
+      login_as r
+      it "redirects to index" do
+        my_question = FactoryGirl.create(:question, :user_id =&gt; @test_user.id)
+        post :destroy, {:id =&gt; my_question.id}
+        expect(response).to redirect_to(questions_path)
+      end
+      it "destroys a record" do
+        my_question = FactoryGirl.create(:question, :user_id =&gt; @test_user.id)
+        post :destroy, {:id =&gt; my_question.id}
+        expect(Question.all).not_to include my_question
+      end
+      it "displays a flash message" do
+        my_question = FactoryGirl.create(:question, :user_id =&gt; @test_user.id)
+        post :destroy, {:id =&gt; my_question.id}
+        expect(flash[:success]).to eq("You have successfully deleted the question")
+      end
+    end
+  end
+end
+</code></pre>
+<p>This spec runs three separate tests for Questions#destroy, but its not very DRY. For each test (called examples in Rspec parlance) we need to generate a question belonging to the user and then make a post request to destroy it. I literally copied and pasted the first two lines of each example. Fortunately there are two methods to help us avoid this repetition.</p>
+<h2>let</h2>
+<p><code>let</code> is a way to lazily define a variable that we can call as many times as we like. So instead of having to make a <code>FactoryGirl</code> call for each example, we can just define it once. The variable is loaded into memory when we actually call it, not when its defined. That changes our code to:</p>
+<pre><code>describe "POST destroy success" do
+  #should be able to destroy when the post belongs to you
+  #or if you are an admin
+  ControllerMacros::ALL_ROLES.each do |r|
+    context "as #{r}" do
+      login_as r
+      let (:my_question) { FactoryGirl.create(:question, :user_id =&gt; @test_user.id) }
+      it "redirects to index" do
+        post :destroy, {:id =&gt; my_question.id}
+        expect(response).to redirect_to(questions_path)
+      end
+      it "destroys a record" do
+        post :destroy, {:id =&gt; my_question.id}
+        expect(Question.all).not_to include my_question
+      end
+      it "displays a flash message" do
+        post :destroy, {:id =&gt; my_question.id}
+        expect(flash[:success]).to eq("You have successfully deleted the question")
+      end
+    end
+  end
+end
+</code></pre>
+<h2>subject</h2>
+<p>And it gets even better. <code>subject</code> gives us a block of code that we can define once and then call when ever we like. The line <code>post :destroy, {:id =&gt; my_question.id}</code> is a perfect candidate for that. Let's alter our code again like so</p>
+<pre><code>describe "POST destroy success" do
+  #should be able to destroy when the post belongs to you
+  #or if you are an admin
+  ControllerMacros::ALL_ROLES.each do |r|
+    context "as #{r}" do
+      login_as r
+      let (:my_question) { FactoryGirl.create(:question, :user_id =&gt; @test_user.id) }
+      subject(:post_destroy) { post :destroy, {:id =&gt; my_question.id} }
+      it "redirects to index" do
+        post_destroy
+        expect(response).to redirect_to(questions_path)
+      end
+      it "destroys a record" do
+        post_destroy
+        expect(Question.all).not_to include my_question
+      end
+      it "displays a flash message" do
+        post_destroy
+        expect(flash[:success]).to eq("You have successfully deleted the question")
+      end
+    end
+  end
+end
+</code></pre>
+<p>Much more DRY! There's less typing, and as an added benefit the implementation details are a bit more abstracted. If someone wants to read my tests they can tell with a little less effort what I am up to. <code>post_destroy</code> is hopefully pretty clear about what is going on. If someone wants to know specifically how I did it they can glance up to where I defined <code>subject</code>, but otherwise they can just assume I did it the standard way and move on.</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=DRYing up Rspec tests with let and subject&amp;url=/drying-up-rspec-tests-with-let-and-subject&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/drying-up-rspec-tests-with-let-and-subject"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

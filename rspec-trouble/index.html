@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Rspec trouble | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="keywords" content="site, website, softwware, software developer, python, djangp, ruby, ruby on rails, javascript, frontend, front-end, html5, css3, jquery, react">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/rspec-trouble">
+<meta property="og:title" content=" Rspec trouble | Jacob Stoebel">
+<meta property="og:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Rspec trouble | Jacob Stoebel">
+<meta name="twitter:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/rspec-trouble">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Rspec trouble</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-03-28"> 2016-03-28
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/rspec-trouble#disqus_thread" data-disqus-identifier="/rspec-trouble">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>I've begun implementing tests using the Rspec framework. Code Workout's tests are still a work in progress (no shade!) and I'm learning how it all fits together. Here's a run down of some obstacles I encountered while attempting to write a few tests for the questions controller.</p>
+<p>I want to create a spec for <code>questions#index</code> like so:</p>
+<pre><code>describe "GET index" do
+  before(:each) do
+   get :index
+  end
+  it "returns http success" do
+    expect(response).to have_http_status(:success)
+  end
+  it "pulls all questions" do
+    # get :index
+    expect(assigns(:questions)).to eq(Question.all)
+  end
+  it "renders the index view" do
+    # get :index
+    expect(response).to render_template("index")
+  end
+end
+</code></pre>
+<p>Here are some of the problems I encountered, and how to fix them:</p>
+<ol>
+<li><p>cannot load such file -- rails_helper.</p>
+<p>For what ever reason, my tests have <code>require 'rails_helper'</code>. This should be changed to <code>require 'spec_helper'</code></p></li>
+<li><p>uninitialized constant SseHelper (NameError)</p>
+<p>Peeking at the file sse_helper_spec.rb I see the problem:</p>
+<pre><code>RSpec.describe SseHelper, :type =&gt; :helper do
+  pending "add some examples to (or delete) #{__FILE__}"
+end
+</code></pre>
+<p>As suggested I commented it out (just for now) and it doesn't complain any more.</p></li>
+<li><p>A whole bunch of other problems trying to run the test suite:</p>
+<p>It looks like the test suite is still being worked on and won't run successfully. I did a little bit of research and found that I can easily run just my own tests by typing <code>spec path/to/your/test</code> Let's just do this instead of trying to fix all of the other tests.</p></li>
+<li><p>My own tests will need some data that can be set up and torn down for each test. My first attempt is this:</p>
+<pre><code>FactoryGirl.create :user
+FactoryGirl.create :exercise
+FactoryGirl.create :question
+</code></pre>
+<p>and I get this error: <code>Couldn't find GlobalRole with 'id'=3</code>. The problem is that a user expects to be assigned a GlobalRole and none have been created.</p></li>
+<li><p>Include the factory?</p>
+<p>Almost. When I try to call the factory <code>global_role_user</code> I get the error: <code>uninitialized constant GlobalRoleUser</code>. For some reason the factory doesn't know which Model to look for so we have to tell it. Change the factory definition to <code>factory :global_role_user, :class =&gt; 'GlobalRole' do</code> and it'll know exactly what model to look for.</p></li>
+<li><p>And success!</p></li>
+</ol>
+<p>Here is my revised setup:</p>
+<pre><code>before(:each) do
+  FactoryGirl.create :global_role_admin
+  FactoryGirl.create :global_role_instructor
+  FactoryGirl.create :global_role_user
+  FactoryGirl.create :exercise
+  FactoryGirl.create :question
+end
+</code></pre>
+<p>The user is created implicitly when I create a question and because the right role is in place, it fits in perfectly. Now when I call this test it runs successfully. Now on to writing more!</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Rspec trouble&amp;url=/rspec-trouble&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/rspec-trouble"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

@@ -1,0 +1,587 @@
+[
+  
+    {
+      "title"    : "Starting Again: Pomodoro App 2",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/starting-again-pomodoro-app-2",
+      "date"     : "2018-10-31 16:49:56 +0000"
+    } ,
+  
+    {
+      "title"    : "Diving into Typescript",
+      "category" : "",
+      "tags"     : "Typescript and Apollo",
+      "url"      : "/diving-into-typescript",
+      "date"     : "2018-09-17 15:48:44 +0000"
+    } ,
+  
+    {
+      "title"    : "A Lesson in Refactoring Complex Classes in Ruby",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/a-lesson-in-refactoring-complex-classes-in-ruby",
+      "date"     : "2018-08-30 10:51:05 +0000"
+    } ,
+  
+    {
+      "title"    : "Automating Some Of My Regular Workflows With Ruby",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/automating-some-of-my-regular-workflows-with-ruby",
+      "date"     : "2018-08-29 16:42:01 +0000"
+    } ,
+  
+    {
+      "title"    : "Jumping Back In: My New Side Project",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/jumping-back-in-my-new-side-project",
+      "date"     : "2018-08-03 12:58:18 +0000"
+    } ,
+  
+    {
+      "title"    : "Deplying a Rails Applicaiton to AWS with Docker  Part 1",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/deplying-a-rails-applicaiton-to-aws-with-docker--part-1",
+      "date"     : "2017-12-02 12:55:08 +0000"
+    } ,
+  
+    {
+      "title"    : "Mocks with Sinon.js",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/mocks-with-sinonjs",
+      "date"     : "2017-08-10 16:09:45 +0000"
+    } ,
+  
+    {
+      "title"    : "Using react leaflet",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/using-react-leaflet",
+      "date"     : "2017-08-10 15:10:57 +0000"
+    } ,
+  
+    {
+      "title"    : "Honesty, Kindness and Inspiration: Pick Three",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/honesty-kindness-and-inspiration-pick-three",
+      "date"     : "2017-05-23 08:16:56 +0000"
+    } ,
+  
+    {
+      "title"    : "Upgrading the EDS Dashobard to Rails 5",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/upgrading-the-eds-dashobard-to-rails-5",
+      "date"     : "2017-04-18 12:29:08 +0000"
+    } ,
+  
+    {
+      "title"    : "A No Frills Jump Into Fakes, Mocks and Stubs",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/a-no-frills-jump-into-fakes-mocks-and-stubs",
+      "date"     : "2017-04-05 10:27:12 +0000"
+    } ,
+  
+    {
+      "title"    : "Getting React and D3 to Play Nice",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/getting-react-and-d3-to-play-nice",
+      "date"     : "2017-04-01 10:48:20 +0000"
+    } ,
+  
+    {
+      "title"    : "setting up a wordpress/rails vps with ansible",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/setting-up-a-wordpressrails-vps-with-ansible",
+      "date"     : "2017-02-19 15:56:58 +0000"
+    } ,
+  
+    {
+      "title"    : "Cleanse Your Batavia Test Output Using This One Weird Trick",
+      "category" : "",
+      "tags"     : "Python, Javascript, and Batavia",
+      "url"      : "/handling-test-output-in-batavia",
+      "date"     : "2017-01-13 11:16:23 +0000"
+    } ,
+  
+    {
+      "title"    : "Automate Gem Security Warnings With Bundle Audit",
+      "category" : "",
+      "tags"     : "ruby and rails",
+      "url"      : "/automate-gem-security-warnings-with-bundle-audit",
+      "date"     : "2017-01-11 15:11:30 +0000"
+    } ,
+  
+    {
+      "title"    : "Seriously, Use Factories and Not Fixtures: A Survivor&#39;s Story",
+      "category" : "",
+      "tags"     : "ruby, rails, and factory_girl",
+      "url"      : "/seriously-use-factories-and-not-fixtures-a-survivors-story",
+      "date"     : "2017-01-05 14:54:20 +0000"
+    } ,
+  
+    {
+      "title"    : "automating modifying dbi at each deploy",
+      "category" : "",
+      "tags"     : "ruby, rails, and capistrano",
+      "url"      : "/automating-modifying-dbi-at-each-deploy",
+      "date"     : "2017-01-04 15:19:42 +0000"
+    } ,
+  
+    {
+      "title"    : "string formatting in Batavia",
+      "category" : "",
+      "tags"     : "Python, JavaScript, and Batavia",
+      "url"      : "/string-formatting-in-batavia",
+      "date"     : "2016-12-22 20:06:35 +0000"
+    } ,
+  
+    {
+      "title"    : "using (and securing) rails_admin",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/using-and-securing-rails_admin",
+      "date"     : "2016-11-21 09:18:06 +0000"
+    } ,
+  
+    {
+      "title"    : "Implementing gmtime in Batavia",
+      "category" : "",
+      "tags"     : "Python, JavaScript, and Batavia",
+      "url"      : "/implementing-gmtime-in-batavia",
+      "date"     : "2016-10-23 19:11:24 +0000"
+    } ,
+  
+    {
+      "title"    : "Implementing mktime in Batavia or why CPython is a better choice for building a time machine",
+      "category" : "",
+      "tags"     : "Python, JavaScript, and Batavia",
+      "url"      : "/implementing-mktime-in-batavia",
+      "date"     : "2016-10-16 14:35:43 +0000"
+    } ,
+  
+    {
+      "title"    : "Implementing struct_time in Batavia",
+      "category" : "",
+      "tags"     : "Python, JavaScript, and Batavia",
+      "url"      : "/implementing-struct_time-in-batavia",
+      "date"     : "2016-09-28 08:42:32 +0000"
+    } ,
+  
+    {
+      "title"    : "Scales in D3",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/scales-in-d3",
+      "date"     : "2016-09-09 05:11:25 +0000"
+    } ,
+  
+    {
+      "title"    : "Implementing Python&#39;s String Manipulation in Batavia",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/implementing-pythons-string-manipulation-in-batavia",
+      "date"     : "2016-09-04 07:41:34 +0000"
+    } ,
+  
+    {
+      "title"    : "setting up matplotlib with virtualenvwrapper",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/setting-up-matplotlib-with-virtualenvwrapper",
+      "date"     : "2016-08-29 08:32:07 +0000"
+    } ,
+  
+    {
+      "title"    : "The Less State the Better: Lessons Learned from React",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/the-less-state-the-better-lessons-learned-from-react",
+      "date"     : "2016-08-20 10:53:59 +0000"
+    } ,
+  
+    {
+      "title"    : "Why I switched my blog to Jekyll",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/why-i-switched-my-blog-to-jekyll",
+      "date"     : "2016-08-10 08:32:02 +0000"
+    } ,
+  
+    {
+      "title"    : "PyOhio 2016",
+      "category" : "",
+      "tags"     : "Python and Open Source",
+      "url"      : "/pyohio-2016/",
+      "date"     : "2016-08-04 20:21:35 +0000"
+    } ,
+  
+    {
+      "title"    : "Learning Async in JavaScript",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/learning-async-in-javascript",
+      "date"     : "2016-06-01 12:30:17 +0000"
+    } ,
+  
+    {
+      "title"    : "Final Presentation Screencast",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/final-presentation-screencast",
+      "date"     : "2016-04-27 12:33:33 +0000"
+    } ,
+  
+    {
+      "title"    : "Self Assessment",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/self-assessment",
+      "date"     : "2016-04-25 14:46:47 +0000"
+    } ,
+  
+    {
+      "title"    : "Final Presentation: script",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/final-presentation-script",
+      "date"     : "2016-04-24 17:20:11 +0000"
+    } ,
+  
+    {
+      "title"    : "Software Engineering Portfolio: an outline",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/software-engineering-portfolio-an-outline",
+      "date"     : "2016-04-20 23:28:32 +0000"
+    } ,
+  
+    {
+      "title"    : "Think twice before you change your Rails primary key data type",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/never-change-your-rails-primary-key-data-type",
+      "date"     : "2016-04-19 13:22:21 +0000"
+    } ,
+  
+    {
+      "title"    : "Code Review",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/code-review",
+      "date"     : "2016-04-13 23:23:15 +0000"
+    } ,
+  
+    {
+      "title"    : "DRYing up Rspec tests with let and subject",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/drying-up-rspec-tests-with-let-and-subject",
+      "date"     : "2016-04-12 21:23:51 +0000"
+    } ,
+  
+    {
+      "title"    : "Communication in a large team",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/communication-in-a-large-team",
+      "date"     : "2016-04-10 14:22:28 +0000"
+    } ,
+  
+    {
+      "title"    : "Moving forward with Rspec/Devise",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/moving-forward-with-rspecdevise",
+      "date"     : "2016-04-06 23:33:00 +0000"
+    } ,
+  
+    {
+      "title"    : "Testing login with Rspec",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/testing-login-with-rspec",
+      "date"     : "2016-04-06 01:35:57 +0000"
+    } ,
+  
+    {
+      "title"    : "CodeWorkout: The Home Strech",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/codeworkout-the-home-strech",
+      "date"     : "2016-04-02 12:00:45 +0000"
+    } ,
+  
+    {
+      "title"    : "More with Rspec",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/more-with-rspec",
+      "date"     : "2016-03-30 21:20:06 +0000"
+    } ,
+  
+    {
+      "title"    : "Rspec trouble",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/rspec-trouble",
+      "date"     : "2016-03-28 22:32:15 +0000"
+    } ,
+  
+    {
+      "title"    : "Tests for Q&amp;A",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/tests-for-qa",
+      "date"     : "2016-03-27 14:11:58 +0000"
+    } ,
+  
+    {
+      "title"    : "Two Tails of Git Woe",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/two-tails-of-git-woe",
+      "date"     : "2016-03-23 00:38:18 +0000"
+    } ,
+  
+    {
+      "title"    : "Issue 61 continued: I may have fixed something!",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/issue-61-continued-i-may-have-fixed-something",
+      "date"     : "2016-03-21 01:19:27 +0000"
+    } ,
+  
+    {
+      "title"    : "CodeWorkout ticket: issue 61",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/codeworkout-ticket-issue-61",
+      "date"     : "2016-03-17 00:06:13 +0000"
+    } ,
+  
+    {
+      "title"    : "Writing tests with Rspec",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/writing-tests-with-rspec",
+      "date"     : "2016-03-15 01:28:12 +0000"
+    } ,
+  
+    {
+      "title"    : "CodeWorkout Q&amp;A forum, creating and editing a question",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/codeworkout-qa-forum-creating-and-editing-a-question",
+      "date"     : "2016-03-12 19:57:11 +0000"
+    } ,
+  
+    {
+      "title"    : "When a small fix becomes a big issue",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/when-a-small-fix-becomes-a-big-issue",
+      "date"     : "2016-03-10 19:22:59 +0000"
+    } ,
+  
+    {
+      "title"    : "Deploying eds_dashboard with Capistrano",
+      "category" : "",
+      "tags"     : "Ruby on Rails, eds_dashboard, and Capistrano",
+      "url"      : "/deploying-eds_dashboard-with-capistrano",
+      "date"     : "2016-03-07 00:00:00 +0000"
+    } ,
+  
+    {
+      "title"    : "Q&amp;A forum: setting up",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/qa-forum-setting-up",
+      "date"     : "2016-03-03 22:36:07 +0000"
+    } ,
+  
+    {
+      "title"    : "Q&amp;A forum: breaking things down",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/qa-forum-breaking-things-down",
+      "date"     : "2016-03-01 00:44:44 +0000"
+    } ,
+  
+    {
+      "title"    : "Q&amp;A part 3, or what to table for later",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/qa-components-part-2-or-what-to-table-for-later",
+      "date"     : "2016-02-25 21:54:42 +0000"
+    } ,
+  
+    {
+      "title"    : "Problem Decomposition and Components: building a Q&amp;A forum",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/problem-decomposition-building-a-qa-forum",
+      "date"     : "2016-02-23 01:06:06 +0000"
+    } ,
+  
+    {
+      "title"    : "Documentation for an exercise YAML file",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/documentation-for-an-exercise-yaml-file",
+      "date"     : "2016-02-21 15:46:03 +0000"
+    } ,
+  
+    {
+      "title"    : "CodeWorkout: building a Q&amp;A forum",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/codeworkout-building-a-qa-forum",
+      "date"     : "2016-02-20 22:17:27 +0000"
+    } ,
+  
+    {
+      "title"    : "Being productivly lazy, or not writing code that isn&#39;t needed",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/writing-code-that-isnt-needed",
+      "date"     : "2016-02-19 00:28:08 +0000"
+    } ,
+  
+    {
+      "title"    : "Contributing to CodeWorkout part 2",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/contributing-to-codeworkout-part-2",
+      "date"     : "2016-02-18 01:34:08 +0000"
+    } ,
+  
+    {
+      "title"    : "Adding an Exercise in CodeWorkout--The Empire Strikes Back",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/adding-an-exercise-in-codeworkout-the-empire-strikes-back",
+      "date"     : "2016-02-17 01:52:49 +0000"
+    } ,
+  
+    {
+      "title"    : "Tackling a ticket in Codeworkout",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/tackling-a-ticket-in-codeworkout",
+      "date"     : "2016-02-14 20:50:50 +0000"
+    } ,
+  
+    {
+      "title"    : "Filing Bugs Like a Pro",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/filing-bugs-like-a-pro",
+      "date"     : "2016-02-11 01:31:21 +0000"
+    } ,
+  
+    {
+      "title"    : "Getting to migrations fast in vim with tab completion.",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/getting-to-migrations-fast-in-vim-with-tab-completion",
+      "date"     : "2016-02-10 15:16:24 +0000"
+    } ,
+  
+    {
+      "title"    : "Adding new Content With Factory Girl",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/adding-new-content-with-factory-girl",
+      "date"     : "2016-02-09 01:52:40 +0000"
+    } ,
+  
+    {
+      "title"    : "Creating a new exercise on CodeWorkout-Part 2",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/creating-a-new-exercise-on-codeworkout-part-2",
+      "date"     : "2016-02-06 21:57:17 +0000"
+    } ,
+  
+    {
+      "title"    : "Creating a new exercise on CodeWorkout-Part 1",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/creating-a-new-exercise-on-codeworkout-part-1",
+      "date"     : "2016-02-05 13:38:02 +0000"
+    } ,
+  
+    {
+      "title"    : "I’ll take my humble pie à la mode",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/ill-take-my-humble-pie-à-la-mode",
+      "date"     : "2016-02-05 00:18:59 +0000"
+    } ,
+  
+    {
+      "title"    : "The Art of Communication",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/the-art-of-communication",
+      "date"     : "2016-02-03 03:01:59 +0000"
+    } ,
+  
+    {
+      "title"    : "Getting CodeWorkout set up on localhost",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/getting-codeworkout-set-up-on-localhost",
+      "date"     : "2016-01-31 19:55:29 +0000"
+    } ,
+  
+    {
+      "title"    : "Ideas for Contribution to CodeWorkout",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/ideas-for-contribution-to-codeworkout",
+      "date"     : "2016-01-31 18:48:14 +0000"
+    } ,
+  
+    {
+      "title"    : "Research on CodeWorkout",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/research-on-codeworkout",
+      "date"     : "2016-01-29 20:04:24 +0000"
+    } ,
+  
+    {
+      "title"    : "Contributing to CodeWorkout",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/contributing-to-codeworkout",
+      "date"     : "2016-01-23 20:03:29 +0000"
+    } ,
+  
+    {
+      "title"    : "Creating a Contract for Collaboration (or building the plane as we fly it)",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/creating-a-contract-for-collaboration-or-building-the-plane-as-we-fly-it",
+      "date"     : "2016-01-21 00:50:35 +0000"
+    } ,
+  
+    {
+      "title"    : "Joining the Open Source Movement",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/joining-the-open-source-movement",
+      "date"     : "2016-01-17 00:44:37 +0000"
+    } 
+  
+]

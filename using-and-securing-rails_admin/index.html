@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> using (and securing) rails_admin | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="using (and securing) rails_admin">
+<meta name="keywords" content="">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/using-and-securing-rails_admin">
+<meta property="og:title" content=" using (and securing) rails_admin | Jacob Stoebel">
+<meta property="og:description" content="using (and securing) rails_admin">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" using (and securing) rails_admin | Jacob Stoebel">
+<meta name="twitter:description" content="using (and securing) rails_admin">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/using-and-securing-rails_admin">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>using (and securing) rails_admin</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-11-21"> 2016-11-21
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/using-and-securing-rails_admin#disqus_thread" data-disqus-identifier="/using-and-securing-rails_admin">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>One expansion to the <a href="https://bitbucket.org/stoebelj/eds_dashboard">EDS Dashobard</a> is all of the necessary features surrounding assessments. Our team worked diligently on the backend infrastructure this summer, but stopped short at implementing a front end for these features. Specifically we needs a way for users to:</p>
+<ul>
+<li>Create new <code>assessments</code> and <code>assessment_versions</code>.</li>
+<li>Create new <code>assessment_items</code> and associate them with <code>assessment_versions</code>.</li>
+<li>Upload <code>student_scores</code> for a particular assessment.</li>
+</ul>
+<p>Originally the intent was to create a front end in React to allow users to accomplish the above user stories in a single, simple to user interface. While this was a nice idea, other priorities for the dashboard quickly mounted pushing this to the back burner. We found ourselves in a predicament. This was a very important feature, but the time cost seemed undoable given everything else we had to accomplish.</p>
+<p>Then I stepped back and reflected on the situation some more. These user stories really only apply to one user: the admin of the app (me). As such, while the functionality is still a high priority, a slick user interface is not. To that end, enter <a href="https://github.com/sferik/rails_admin">rails_admin</a> a gem for creating a basic CRUD for each of your models. Rails_admin creates an interface based on your existing models. It lets you assign or create associated records on one page, import/export from/to CSV and a whole lot more. Perfect! I had been using MySQL workbench when I needed to peek into production data or make small tweaks, but since it bypasses the model layer, rails_admin is a much better option all around.</p>
+<h2>Authorizing</h2>
+<p>Authorization proved a bit tricky for me. I found something that works for now, but I would prefer a better solution in the future. Regular pages on my app are routed through a a controller that I implement. As such, I am typically able to access the method <code>current_user</code> and determine from there if the user should be able to access the resource. For <code>rails_admin</code> we define a block in an initializer to determine how authorization should work. I have not yet determined how to access <code>current_user</code> inside this block. Fortunately, <code>current_user</code> simply looks at the session hash to determine user name. Here's the code:</p>
+<pre><code>config.authorize_with do
+  case Rails.env
+  when "production"
+    user_name = session[:user]
+  when "development"
+    user_name = session[:user]
+  when "test"
+    user_name = request.filtered_parameters["env"]["REMOTE_USER"]
+  else
+    raise "unknown enviornment: #{Rails.env}"
+  end
+  user = User.find_by :UserName =&gt; user_name
+  redirect_to "/access_denied" if [!user.andand.is?("admin") || user.nil?].any?
+end
+</code></pre>
+<h2>Testing</h2>
+<p>Since <code>rails_admin</code> is not from a controller I own, a controller test is not possible. Instead I setup an integration test:</p>
+<pre><code>class RailsAdminTest &lt; ActionDispatch::IntegrationTest
+  allowed_roles = ["admin"]
+  all_roles = Role.all.pluck :RoleName
+  test "gets admin" do
+    request_admin("admin")
+    assert_response :success
+  end
+  describe "doesn't get admin" do
+    (all_roles - allowed_roles + [nil]).each do |r|
+      test "as #{r}" do
+        request_admin(r)
+        assert_redirected_to "/access_denied"
+      end
+    end
+  end
+  private
+  def request_admin(role_name)
+    role = Role.find_by :RoleName =&gt; role_name
+    user = User.find_by :Roles_idRoles =&gt; role.andand.id
+    get '/admin', env: { "REMOTE_USER" =&gt; user.andand.UserName}
+  end
+end
+</code></pre>
+<p>Typically I use a helper method called <code>load_session</code> which loads up the session hash to simulate a logged in user. This approach doesn't seem to work here (for reasons still unknown to me I get an infinite recursion). Instead I had to pass a username directly into the request. I'm not satisfied with this process as it seems like an unnecessary deviation of actual production behavior, but at this point it is the only solution I could work out. Currently, I'm looking for a better one.</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=using (and securing) rails_admin&amp;url=/using-and-securing-rails_admin&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/using-and-securing-rails_admin"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

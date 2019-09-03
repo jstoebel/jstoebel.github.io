@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Adding an Exercise in CodeWorkout--The Empire Strikes Back | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="keywords" content="site, website, softwware, software developer, python, djangp, ruby, ruby on rails, javascript, frontend, front-end, html5, css3, jquery, react">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/adding-an-exercise-in-codeworkout-the-empire-strikes-back">
+<meta property="og:title" content=" Adding an Exercise in CodeWorkout--The Empire Strikes Back | Jacob Stoebel">
+<meta property="og:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Adding an Exercise in CodeWorkout--The Empire Strikes Back | Jacob Stoebel">
+<meta name="twitter:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/adding-an-exercise-in-codeworkout-the-empire-strikes-back">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Adding an Exercise in CodeWorkout--The Empire Strikes Back</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-02-17"> 2016-02-17
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/adding-an-exercise-in-codeworkout-the-empire-strikes-back#disqus_thread" data-disqus-identifier="/adding-an-exercise-in-codeworkout-the-empire-strikes-back">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <h4>TL:DR</h4>
+<p>I still haven't figured out how to add an exercise, but I'm closer</p>
+<p>This is the next chapter in my saga in working out how to enter an exercise in CodeWorkout. This evening as I was digging around the app's routes file I found two encouraging paths</p>
+<pre><code>exercises_import_path   GET     /gym/exercises_import(.:format)     exercises#upload_yaml
+exercises_yaml_create_path  POST    /gym/exercises_yaml_create(.:format)    exercises#yaml_create 
+</code></pre>
+<p>It looks like there is some infrastructure for uploading and processing a YAML file of an exercise after all. I tried typing in <code>/gym/exercises_import</code> and get an error: missing template. Looks like this hasn't been implemented yet. I went ahead and made my own, just to play with:</p>
+<pre><code>#upload_yaml.html.haml
+I am upload_yaml
+&lt;/br&gt;
+find me at gym/exercises_import
+= render :file =&gt; 'exercises/upload.html.haml'
+</code></pre>
+<p>Fortunately, a simple form to select a file is already provided in <code>upload.html.haml</code> which I render on the final line.  Here's that form:</p>
+<pre><code>= form_tag exercises_url + '/exercises_yaml_create', multipart: true do
+= file_field('form', 'file')
+= submit_tag 'Submit File'
+</code></pre>
+<p>The form even seems to know where to send the request.</p>
+<p>Now let's make a yaml file to feed in. I made a very simple .yaml file from <code>exercise-format.txt</code></p>
+<pre><code>Title: Python
+Language: Python
+Tags:     if, condition, plus, integer
+Stem: "Stem goes here"
+Code: print
+Explanation: "Explanation here"
+Tests: "Test here"
+</code></pre>
+<p>Great! So let's try uploading the file and we get...an error: <code>undefined method</code>has_key?' for ["Title", "teenSum"]:Array` Occurring here:</p>
+<pre><code>collection_representer class: Exercise, instance: lambda { |fragment, i, args|
+if fragment.has_key? 'external_id'
+  e = Exercise.where(external_id: fragment['external_id']).first
+  e || Exercise.new
+else
+</code></pre>
+<p>Hmmm, I'm not exactly sure what's going on here . Doing a bit of inferring it looks like this is a decorator class that is looking to see if we have included an external_id in the YAML file and if so finds and exercise with that id. Failing that, it simply creates a new Exercise.</p>
+<p>Let's try a different tact:  I also see there is also another action in this controller that has something to do with creating exercises: <code>yaml_create</code>. Let's try to send the file over there. Trying to do so initially throws an error. It was expecting a param called :yamlfile but it only got :file. Fixing that quick, we then get a second error on line 340 no implicit conversion of String into Integer for   <code>@ex.name = exercise['name']</code> Taking a glance at the controller I can tell what is <em>meant</em> to happen but some piece of the puzzle is not working right. Either my yaml file is not composed properly or their is something wrong with the code in the controller. I will have to keep digging.</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Adding an Exercise in CodeWorkout--The Empire Strikes Back&amp;url=/adding-an-exercise-in-codeworkout-the-empire-strikes-back&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/adding-an-exercise-in-codeworkout-the-empire-strikes-back"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

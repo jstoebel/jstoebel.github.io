@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Writing tests with Rspec | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="keywords" content="site, website, softwware, software developer, python, djangp, ruby, ruby on rails, javascript, frontend, front-end, html5, css3, jquery, react">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/writing-tests-with-rspec">
+<meta property="og:title" content=" Writing tests with Rspec | Jacob Stoebel">
+<meta property="og:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Writing tests with Rspec | Jacob Stoebel">
+<meta name="twitter:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/writing-tests-with-rspec">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Writing tests with Rspec</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-03-15"> 2016-03-15
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/writing-tests-with-rspec#disqus_thread" data-disqus-identifier="/writing-tests-with-rspec">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>With our work under way of version 0 of the Q&amp;A forum, I thought I would begin to tackle writing unit tests. CodeWorkout uses Rspec for their tests, which is a popular testing framework for Ruby. I am familiar with the rival testing framework MiniTest, so Rspec will be new territory for me. Here's what I learned so far:</p>
+<h2>Factory Girl</h2>
+<p>Factory Girl is a great way to dynamically generate test data for tests. Here is a simple factory to make a question and a response:</p>
+<pre><code>FactoryGirl.define do
+  factory :question do
+    title "a question"
+    body "question body text"
+    tags "for loops; conditionals"
+    user
+    exercise
+  end
+end
+FactoryGirl.define do
+  factory :response do
+    text "response text"
+    user
+    question
+  end
+end
+</code></pre>
+<p>Hopefully the language is clear enough. a <code>:question</code> factory creates a new Question object with the specified <code>title</code>, <code>body</code> and <code>tags</code>.  I also specified that the question should have a <code>user</code> and an <code>exercise</code>. These are associated tables and in the case of user it doesn't make sense for a question to not have a user. I don't want to bother with matching the question with  a valid <code>exercise</code> or <code>user</code> so I simply say "this question will have an exercise, just pick one. The <code>:response</code> factory works in much the same way.</p>
+<p>If we want to use factories in our Rspec tests we would say something like the following at the top of our test.</p>
+<pre><code>before(:each) do
+  FactoryGirl.create :confirmed_user, {:email =&gt; "test@test.com"}
+  FactoryGirl.create :question
+end
+</code></pre>
+<p>The block before(:each) tells the test suite that the following should be run before each test. Specifically, a user is created and a question is created. Any data created in a before(:each) block is rolled back after each test. This is important because we don't want data created in one test to be lying around after another test, potentially messing up results. We want each test to start from square one. If for some reason we needed to create data once and persist throughout all tests we would set it up inside before(:all)</p>
+<h2>Testing questions#new</h2>
+<p>To start, I want to test the simple controller action <code>questions#new</code>. If this action is working correctly two things will happen:</p>
+<ul>
+<li>It will assign an instance variable <code>@question</code> which is a new <code>Question</code> object.</li>
+<li><p>It will return a successful HTTP response (200)</p>
+<pre><code>  describe "GET new" do
+    it "returns http success" do
+      get :new
+      expect(response).to have_http_status(:success)
+      assigns(:question).should be_a_new(Question)
+    end
+  end
+</code></pre></li>
+</ul>
+<p>This test is for the get new action. This test does three things:</p>
+<ul>
+<li>it performs a get request on the resource.</li>
+<li>it expects a successful response.</li>
+<li>it makes sure that <code>@question</code> was set up and it is a new instance of the <code>Question</code> class.</li>
+</ul>
+<p>Now we can run it by typing  <code>rake spec SPEC=spec/controllers/questions_controller_spec.rb</code></p>
+<p>Assuming everything went correctly, we should get something like</p>
+<pre><code>Finished in 0.17649 seconds (files took 3.8 seconds to load)
+1 example, 0 failures
+</code></pre>
+<p>If we get an error message we'll know what to fix.</p>
+<p>I would like to continue building tests for our version 0 of the Q&amp;A forum. This is an opportunity to use test driven development, wherein we can specify what we expect our code to accomplish and then write code based on those specs.</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Writing tests with Rspec&amp;url=/writing-tests-with-rspec&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/writing-tests-with-rspec"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

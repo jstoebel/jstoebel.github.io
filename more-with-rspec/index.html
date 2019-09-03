@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> More with Rspec | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="keywords" content="site, website, softwware, software developer, python, djangp, ruby, ruby on rails, javascript, frontend, front-end, html5, css3, jquery, react">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/more-with-rspec">
+<meta property="og:title" content=" More with Rspec | Jacob Stoebel">
+<meta property="og:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" More with Rspec | Jacob Stoebel">
+<meta name="twitter:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/more-with-rspec">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>More with Rspec</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-03-30"> 2016-03-30
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/more-with-rspec#disqus_thread" data-disqus-identifier="/more-with-rspec">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>Rspec is a powerful framework that lets us test all kinds of different things in our rails application. The more I use it, the more I am seeing just how many different parts of the application tests need to effect. For example, session data. Today, I came across this error on a simple test.</p>
+<pre><code>QuestionsController POST create success redirects to index
+ Failure/Error: expect {post(:create,
+ NoMethodError:
+   undefined method `authenticate' for nil:NilClass
+ # ./app/controllers/questions_controller.rb:46:in `create'
+ # ./spec/controllers/questions_controller_spec.rb:65:in `block (4 levels) in &lt;top (required)&gt;'
+ # ./spec/controllers/questions_controller_spec.rb:65:in `block (3 levels) in &lt;top (required)&gt;'
+</code></pre>
+<p>This method needs to know who the signed in user is, because it implicitly draws on the user id to create a <code>Question</code>. So how to we simulate this in a test?</p>
+<h3>current_user</h3>
+<p>The method <code>current_user</code> pulls the <code>User</code> object for who ever is signed in. It looks to the <code>session</code> hash to determine this. If there's no user in the session hash, any call to <code>current_user</code> will return <code>nil</code>. Can look at the definition to <code>current_user</code> to backward engineer a valid user, and then load up session data appropriatly? In a smaller rails application I've worked on, <code>current_user</code> is simply defined in the <code>ApplicationController</code>. A simple search found no reference to <code>def current_user</code>. What gives? It has to be defined somewhere. A bit more research turned up that current_user is defined implicitly in the devise gem (a gem for authentication) and not in the applicaiton codebase at all.  I took a look inside and it was a bit tricky to work out what was going on. Too abstract. Let's try another approch.</p>
+<h3>Ask Google!</h3>
+<p>Fortunatly, Google came through for me again with <a href="http://luisalima.github.io/blog/2013/01/09/how-i-test-part-iv/">this article</a>. If we include these lines of code, we can fake the signing in of a user:</p>
+<pre><code>@request.env["devise.mapping"] = Devise.mappings[:admin]
+sign_in user
+</code></pre>
+<p>Almost, but not quite. I run the test with these two lines added and get another error:</p>
+<pre><code>Failure/Error: sign_in user
+     NoMethodError:
+       undefined method `sign_in' for #&lt;RSpec::ExampleGroups::QuestionsController::ATest:0x007ff383c6c5b8&gt;
+</code></pre>
+<p>I'm spoiled on Python! Requiring and including stuff in Ruby is less straight forward. How do I do something as simple pull in the method <code>sign_in</code>? More research, turns up that I need to have <code>include Devise::TestHelpers</code> at the top of the test. So all together it would look something like this.</p>
+<pre><code>RSpec.describe QuestionsController, :type =&gt; :controller do
+  include Devise::TestHelpers
+  before(:each) do
+    FactoryGirl.create :global_role_admin
+    FactoryGirl.create :global_role_instructor
+    FactoryGirl.create :global_role_user
+    user = FactoryGirl.create :confirmed_user
+    FactoryGirl.create :exercise
+    FactoryGirl.create :question
+    @request.env["devise.mapping"] = Devise.mappings[:user]
+    sign_in user
+  end
+  describe "POST create success" do
+    it "redirects to index" do
+      question_params = FactoryGirl.attributes_for(:question)
+      expect {post(
+          :create, 
+          {:question =&gt; question_params},
+          {:user_id =&gt; User.first.id}
+        ) 
+      }.to change(Question, :count).by(1)
+      expect(response).to redirect_to(questions_path)
+    end
+  end
+</code></pre>
+<p>And it works!</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=More with Rspec&amp;url=/more-with-rspec&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/more-with-rspec"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

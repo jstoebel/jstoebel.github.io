@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Issue 61 continued: I may have fixed something! | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="keywords" content="site, website, softwware, software developer, python, djangp, ruby, ruby on rails, javascript, frontend, front-end, html5, css3, jquery, react">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/issue-61-continued-i-may-have-fixed-something">
+<meta property="og:title" content=" Issue 61 continued: I may have fixed something! | Jacob Stoebel">
+<meta property="og:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Issue 61 continued: I may have fixed something! | Jacob Stoebel">
+<meta name="twitter:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/issue-61-continued-i-may-have-fixed-something">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Issue 61 continued: I may have fixed something!</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-03-21"> 2016-03-21
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/issue-61-continued-i-may-have-fixed-something#disqus_thread" data-disqus-identifier="/issue-61-continued-i-may-have-fixed-something">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>After several more hours looking into issue 61 (<a href="http://www.jstoebel.com/blog/codeworkout-ticket-issue-61/">see previous blog post</a>) I may have found a solution for the problem! It was a multi-step process:</p>
+<h2>WorkoutOffering and WorkoutPolicy</h2>
+<p>The sample data (as provided by <code>rake db:populate</code>) was providing a <code>Workout</code>, but for some reason it was not showing up when I clicked on the courses page. Here's why: A Workout is a collection of exercises. Workouts can belong to the gym (anyone can do them at any time) and they can belong to any number of courses. The record that links a <code>Workout</code> to a specific course is called a <code>WorkoutOffering</code>. If we look at the view courses#show we find the following:</p>
+<pre><code>  - @course_offerings.each do |offering|
+    - if @is_student
+      - offering.workout_offerings.visible_to_students.in_groups_of(2, false) do |row|
+        = render row, locals: { uid: current_user.id }
+        .clearfix
+    - else
+      - offering.workout_offerings.in_groups_of(2, false) do |row|
+        = render row, locals: { uid: current_user.id }
+        .clearfix 
+</code></pre>
+<p>The method <code>visible_to_students</code> is filtering a course's workout_offerings based on if they should be visible to students. This is defined as:</p>
+<p>WorkoutOffering needs to have</p>
+<ul>
+<li><code>published = true</code></li>
+<li><code>opening_date &lt; DateTime.now</code></li>
+</ul>
+<p>Also, each <code>WorkoutOffering</code> follows a <code>WorkoutPolicy</code>. That policy must have <code>invisible_before_review = false</code></p>
+<p>Currently <code>rake db:populate</code> isn't creating any <code>WorkoutOffering</code> or <code>WorkoutPolicy</code> objects. Let's create them now using factory girl.</p>
+<pre><code>FactoryGirl.define do
+  factory :workout_offering do
+    course_offering_id 1
+    workout_id 1
+    published true
+    opening_date DateTime.now
+    soft_deadline 1.year.from_now
+    hard_deadline 1.years.from_now
+  end
+end
+</code></pre>
+<p>and...</p>
+<pre><code>FactoryGirl.define do
+  factory :workout_policy do
+    name "my policy"
+    invisible_before_review false
+    after(:create) do |wpolicy|
+        create(:workout_offering, workout_policy: wpolicy)
+    end
+  end
+end
+</code></pre>
+<p>the method <code>after</code> is callback, meaning that once we make a <code>WorkoutPolicy</code> record we will run the <code>workout_offering</code> factory and associate that newly created policy with it.</p>
+<h2>Display feedback if closed</h2>
+<p>On the view <code>exercise#practice</code> where exercises are displayed, we will display the exercise feedback rather than the exercise itself if the workout is closed. So how do we know if it is closed? This is a somewhat complex question since a WorkoutOffering has both a soft and hard deadline <em>and</em> individual students may request extensions for an offering. Ultimately, I decided that the phrasing <em>completely closed</em> should mean the offering is closed for everyone in the class. Fortunately there is an instance method to help with this. Calling the method <code>ultimate_deadline</code> returns the date by which the workout is due for every student in the class. So if we switch over to the exercise#practice view we see:</p>
+<pre><code>- @exercise_version.prompts.each do |question_prompt|
+    - prompt = question_prompt.specific
+    #display each prompt in the exercise here...
+</code></pre>
+<p>Its simply a matter of adding a conditional statement to check if the prompt should be shown, or feedback should be displayed.</p>
+<pre><code>- @exercise_version.prompts.each do |question_prompt|
+  / If the workout deadline hasn't passed:
+  - if @workout_offering.ultimate_deadline &gt;= DateTime.now
+      #render the prompt
+  - else
+      #render feedback
+</code></pre>
+<p>As of this writing, I still want to clean up my solution, add comments and make the HTML look decent, but the jist of the solution is here!</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Issue 61 continued: I may have fixed something!&amp;url=/issue-61-continued-i-may-have-fixed-something&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/issue-61-continued-i-may-have-fixed-something"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Learning Async in JavaScript | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="keywords" content="site, website, softwware, software developer, python, djangp, ruby, ruby on rails, javascript, frontend, front-end, html5, css3, jquery, react">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/learning-async-in-javascript">
+<meta property="og:title" content=" Learning Async in JavaScript | Jacob Stoebel">
+<meta property="og:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Learning Async in JavaScript | Jacob Stoebel">
+<meta name="twitter:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/learning-async-in-javascript">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Learning Async in JavaScript</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-06-01"> 2016-06-01
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/learning-async-in-javascript#disqus_thread" data-disqus-identifier="/learning-concurrency-in-javascript">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>Recently, I completed Freecodecamp's <a href="https://www.freecodecamp.com/jstoebel">Front End Development Program</a>. The curriculum is in Javascript meaning that callbacks and promises were on the menu for me to wrestle with. There were plenty of great resources out there to help new developers with these challenges, but as part of my learning, I thought it would be useful to summarize some of the lessons I learned. At the very least, this will help solidify my learning. And it might even be a useful quick resource to others as they walk the same path I do.</p>
+<h2>Async</h2>
+<p>Coming from Python, asynchronous operations was a tricky topic to get my head around. Here's the basic idea: Let's say you execute a command that doesn't finish instantly. You might be setting a timer, or executing an AJAX request. Typically, a callback is given to that command; something that should be done once that command is finished. So for example you might have:</p>
+<pre><code>Do a thing
+Do another thing
+Set a timer for 5 seconds
+    when its down do a thing
+Do a final thing.
+</code></pre>
+<p>A beginner coming from Python would be forgiven for thinking that the line <code>do a final thing</code> would run last right? Not quite. The confusing, but ultimately great thing is that JavaScript doesn't just wait around for a a timer to end. There's other work to be done! Once the timer has been set <code>Do a final thing</code> runs right away, then there is a pause and then the timer's callback is called. Think about it this way: if you were cleaning your house, when you put some laundry in the washing machine, you wouldn't just sit there while the cycle runs waiting for it to finish. You would probably go work on something else for a while. When the cycle finishes the "callback" runs, which means you take the clothes out of the machine and hang them up to dry. As a more real world example, I was working on a clone of the game <a href="https://www.freecodecamp.com/jstoebel">Simon</a>. The game needs to playback a series of flashes to the user, but there needs to be a gap of time in between the flashes to allow for the user's brain to process the information. This means that we need to set two timers. One to trigger the end of a flash and another to trigger the beginning of the next (with a gap of time in the middle). We might be tempted to write psudocode like this:</p>
+<pre><code>loop over each move:
+    turn on button
+    set a timer for 500 ms:
+        when its done, turn off the button
+        set a timer for 200 ms:
+            when its done flash the next button
+</code></pre>
+<p>I knew I had an issue with async when this code didn't work as I expected. Again, once Javascript sets a timer it does not wait for it to finish. It keeps going with the next line of code, which in this case means the next iteration of the for loop. This isn't what we want.</p>
+<h3>Use a generator!</h3>
+<p>This seemed like a perfect place to use a generator. A generator is an object that knows how to produce a series of values. Here is what I came up with:</p>
+<pre><code>this.playback = function(){
+    //playback the current set of moves.
+    var game = this;
+    function* getMove(){
+        var mi = 0;
+        while(mi &lt; game.moves.length){
+            yield game.moves[mi]
+            mi++
+        }
+    }
+    var moveGen = getMove();
+    this.playbackFlash(moveGen);
+}
+this.playbackFlash = function(moveGen){
+    //flashes button, plays sound and sets timer. When timer goes off, decide if it should call again.
+    //moveGen: generator that traverses the moves array
+    //this function is recursive. It uses a generator to determine the next item in the array to act on.
+    //when we fall off the end of the array, the method will stop recursing.
+    $("simon-btn").removeClass("flash");
+    $(".simon-btn").off("click")
+    var move_obj = moveGen.next()
+    if(move_obj.done == false){
+        var move = move_obj.value;
+        console.log("flashing "+move);
+        var btn = "#btn"+move;
+        this.flash(move)
+        this.playCorrectSound(move);
+        var game = this;
+        setTimeout(function(){
+            //timer to end current flash
+            game.endFlash(move)
+            setTimeout(function(){
+                //timer before next flash
+                game.playbackFlash(moveGen)
+            }, 200)
+        }, this.speed)
+    } else {
+        this.takeGuess();
+    }
+}
+</code></pre>
+<p>These are the two methods for playing back the sequence of flashes to the player. The method <code>playback</code> creates a generator that knows how to traverse <code>moves</code> which is just an array of integers corresponding to the button to flash. The generator is passed to <code>playbackFlash</code>. For each call to <code>playbackFlash</code> we call <code>.next()</code> on the generator which produces the next series in the array. We can then turn the button on, set a timer to turn it off, and then set a timer for 200 ms before the next flash. When that second times goes off, our callback can call <code>playbackFlash</code> again passing in the same generator. Because the generator preserves its state, when it has reached the end of its collection the function's if statement will fail and the function will pass control to another part of the program (the part where we handle the player's input.)</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Learning Async in JavaScript&amp;url=/learning-async-in-javascript&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/learning-async-in-javascript"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

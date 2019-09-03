@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Think twice before you change your Rails primary key data type | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="keywords" content="site, website, softwware, software developer, python, djangp, ruby, ruby on rails, javascript, frontend, front-end, html5, css3, jquery, react">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/never-change-your-rails-primary-key-data-type">
+<meta property="og:title" content=" Think twice before you change your Rails primary key data type | Jacob Stoebel">
+<meta property="og:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Think twice before you change your Rails primary key data type | Jacob Stoebel">
+<meta name="twitter:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/never-change-your-rails-primary-key-data-type">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Think twice before you change your Rails primary key data type</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-04-19"> 2016-04-19
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/never-change-your-rails-primary-key-data-type#disqus_thread" data-disqus-identifier="/never-change-your-rails-primary-key-data-type">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>In most cases, a database table does just fine with an auto incrementing integer as its primary key.  We are taking a piece of data "from the wild" and representing it in a database table. The first thing the record needs is a unique identifier. Not having one naturally, we just give it an arbitrary number. A blog post for example is an abstract construct. We simply assign an arbitrary, unique number and move along. This is such a common concept that ActiveRecord (the most popular Ruby ORM, and default for Rails) uses this practice by default. Here the id, defauls to auto incrementing integer implicetly.</p>
+<pre><code>class AddPosts &lt; ActiveRecord::Migration
+    def change
+        create_table :posts do |t|
+            t.string :title
+            t.text :content
+            t.timestamps
+    end
+end
+</code></pre>
+<p>For my fellow Python fans who are shouting "hey! <a href="https://www.python.org/dev/peps/pep-0020/">Explicit is better than implicit</a>" calm down. This is Ruby, not Python. There's something to be learned from the wisdom of another community.</p>
+<p>But what happens if we want our primary key to be a non integer? Here at Berea College, student ids are formatted as the string "B00" followed by six digits (example "B00123456"). Rails allows for us to set a string a primary key in the migration file by doing this:</p>
+<pre><code>class AddStudents &lt; ActiveRecord::Migration
+    def change
+        create_table "students", :id =&gt; false do |t|
+            t.string "Bnum", :primary_key =&gt; true
+            t.string  "FirstName"
+            t.string  "PreferredFirst"
+            t.string  "MiddleName"
+            t.string  "LastName"
+            t.string  "PrevLast"
+            t.string  "ProgStatus""Prospective"
+            t.string  "Major"
+        end
+    end
+end
+</code></pre>
+<p>This works as expected when we migrate, but the problem arises when we take a look at the file <code>schema.rb</code></p>
+<pre><code>  create_table "students", primary_key: "Bnum", force: true do |t|
+    t.string  "FirstName"
+    t.string  "PreferredFirst"
+    t.string  "MiddleName"
+    t.string  "LastName"
+    t.string  "PrevLast"
+    t.string  "ProgStatus"
+    t.string  "EnrollmentStatus"
+  end
+</code></pre>
+<p>What gives? The rake task <code>db:schema:dump</code> completely ignored our wishes to make the primary key a string. This is a <a href="https://github.com/rails-sqlserver/activerecord-sqlserver-adapter/issues/395">documented issue</a> but it won't be fixed any time soon. You may ask why this is a problem. Can't we just always build the database using <code>db:migrate</code>. We <em>can</em> do this, but that would mean that every time we deploy we need to run <em>all</em> of the migrations to get the database to the state we want it. That means taking the twisty, turny, Candy Land type journey to get from a fresh database to where we need it. As our collection of migrations grows this can cause significant slow down in our work flow. A functioning <code>schema.rb</code> on the otherhand will take us straight to where we need, from point A directly to point B.</p>
+<h2>workaround 1: using raw SQL</h2>
+<p>If we are sure we want to use non integers as primary keys we can do the following</p>
+<ol>
+<li>Open up <code>config/application.rb</code> and change <code>config.active_record.schema_format = :ruby</code> to <code>config.active_record.schema_format = :sql</code></li>
+<li><p>This won't however change the behavior of <code>db:schema:dump</code> (the task that is run when ever we migrate). To fix add the following rake task to your project to dump sql after migration.</p>
+<p> Rake::TaskManager.class_eval do
+  def remove_task(task_name)
+    @tasks.delete(task_name.to_s)
+  end
+end</p>
+<p>Rake.application.remove_task('db:schema:dump')
+namespace :db do
+  namespace :schema do
+    task :dump do
+      Rake::Task['db:structure:dump'].execute
+    end
+  end
+end</p></li>
+</ol>
+<h2>workaround 2: refactor to use the defaults</h2>
+<p>In my limited experience, I've noticed that Rails uses sensible defaults to guide the user towards a smart design. My attempt to not use integers as a primary key is a perfect example of this. While I could go with the above change, I will instead be refactoring my database to use all auto-incrementing integers as primary keys. While this may be a bit of work in the short term, my intention is to get my project a little bit closer with the rails convention and (hopefully) avoid larger problems down the line. The morale of this whole story? Let the conventions guide your design unless you have a <em>really</em> good, well researched reason not to.</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Think twice before you change your Rails primary key data type&amp;url=/never-change-your-rails-primary-key-data-type&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/never-change-your-rails-primary-key-data-type"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

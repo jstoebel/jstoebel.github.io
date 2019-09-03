@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Tackling a ticket in Codeworkout | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="keywords" content="site, website, softwware, software developer, python, djangp, ruby, ruby on rails, javascript, frontend, front-end, html5, css3, jquery, react">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/tackling-a-ticket-in-codeworkout">
+<meta property="og:title" content=" Tackling a ticket in Codeworkout | Jacob Stoebel">
+<meta property="og:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Tackling a ticket in Codeworkout | Jacob Stoebel">
+<meta name="twitter:description" content="Software developer and xkcd forwarder. Python, Ruby, JavaScript etc.">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/tackling-a-ticket-in-codeworkout">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Tackling a ticket in Codeworkout</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-02-14"> 2016-02-14
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/tackling-a-ticket-in-codeworkout#disqus_thread" data-disqus-identifier="/tackling-a-ticket-in-codeworkout">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>Today I am looking at a ticket in the CodeWorkout issue tracker. The issue is already being worked on by someone else so I won’t implement it but it seemed like a fun way to dive into the code base. The ticket is:</p>
+<blockquote><h4><span class="js-issue-title">Randomize the workout exercises</span> <span class="gh-header-number">#75</span></h4>
+<p>Implement the randomization of the order of the exercises in a workout. Might need to do assign a random order of questions to each user.</p></blockquote>
+<p>In addition to being a tool for teaching people computer programming, CodeWorkout is also a platform for collecting data on new programmers and how they problem solve. Any valid experiment needs the ability to randomize the order to conditions, thus the ticket. Let’s give it a shot.</p>
+<p>Firing up the rails console, we see that there is one Workout included in the sample data. If we go into the course CS 1114: Introduction to Software Design we don’t see any workouts. What gives? Studying the ERD, we’re able to trace a workout to a course as follows:</p>
+<ul>
+<li>A workout has many workout offerings. A WorkoutOffering represents how a workout is presented to a unique course offering.</li>
+<li>A CourseOffering has numerous WorkoutOfferings (aka homework assignments or problem sets).</li>
+<li>A Course has many CourseOfferings (aka numerous sections of a single course).</li>
+</ul>
+<p>All of this is a bit complicated, but it gives instructors the ability to assign a workout to their students with deadlines independent of other sections. We need to complete a new WorkoutOffering object in order to hook up our Workout with the CourseOffering:</p>
+<pre><code>co = CourseOffering.first  
+=&gt; #&lt;CourseOffering id: 1, course_id: 1, term_id: 1, label: "MWF 10:00am", url: "http://courses.cs.vt.edu/~cs2114/Fall2013", self_enrollment_allowed: false, created_at: "2016-02-14 18:27:46", updated_at: "2016-02-14 18:27:46", cutoff_date: nil&gt;`
+wkout = Workout.first  
+=&gt; #&lt;CourseOffering id: 1, course_id: 1, term_id: 1, label: “MWF 10:00am”, url: “[http://courses.cs.vt.edu/~cs2114/Fall2013&amp;#8221](http://courses.cs.vt.edu/~cs2114/Fall2013&amp;#8221);, self_enrollment_allowed: false, created_at: “2016-02-14 18:27:46”, updated_at: “2016-02-14 18:27:46”, cutoff_date: nil&gt;
+#lets make a new workout offering to connect the workout to the course offering  
+wo = WorkoutOffering.new  
+=&gt; #&lt;CourseOffering id: 1, course_id: 1, term_id: 1, label: “MWF 10:00am”, url: “[http://courses.cs.vt.edu/~cs2114/Fall2013&amp;#8221](http://courses.cs.vt.edu/~cs2114/Fall2013&amp;#8221);, self_enrollment_allowed: false, created_at: “2016-02-14 18:27:46”, updated_at: “2016-02-14 18:27:46”, cutoff_date: nil&gt;
+#opened yesterday and closing 100 days from now  
+wo.assign_attributes({course_offring_id: co.id, workout_id: wkout.id, opening_date: Date.today-1, hard_deadline: Date.today + 100, published: true })  
+=&gt; #&lt;CourseOffering id: 1, course_id: 1, term_id: 1, label: “MWF 10:00am”, url: “[http://courses.cs.vt.edu/~cs2114/Fall2013&amp;#8221](http://courses.cs.vt.edu/~cs2114/Fall2013&amp;#8221);, self_enrollment_allowed: false, created_at: “2016-02-14 18:27:46”, updated_at: “2016-02-14 18:27:46”, cutoff_date: nil&gt;
+wo.save
+</code></pre>
+<p>Now we go back to the course and we see the workout appears in the course! Now that we understand how a workout is hooked into a course we need to figure out how to randomize. My guess is that it isn’t enough to simply randomize the ordering of exercises each time we display them in the workout. That would result in a user seeing a different ordering each time they index the workout. Most likely, we want user to be given the exercises in a random order and that order to persist each time they pull up the workout. This could be achieved in a number of ways, but one potential way of accomplishing this would be to create a new table that stores this order. The table workout_scores, holds an instance of a single progress on a workout. We could potentially associate with this table a new table called workout_ordering that maps each exercise in the workout to an auto incrementing number. The first time a user attempts a workout, this ordering is created, but when the user returns to the workout later, the original ordering is referenced to determine the ordering the exercises are displayed.</p>
+<p>Since this ticket is claimed by someone else, I will not work on implementing it so as not step on toes. Regardless, this was a useful exercise in understanding the codebase a little more.</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Tackling a ticket in Codeworkout&amp;url=/tackling-a-ticket-in-codeworkout&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/tackling-a-ticket-in-codeworkout"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

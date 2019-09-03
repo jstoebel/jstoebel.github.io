@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Using react leaflet | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Using react-leaflet">
+<meta name="keywords" content="">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/using-react-leaflet">
+<meta property="og:title" content=" Using react leaflet | Jacob Stoebel">
+<meta property="og:description" content="Using react-leaflet">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Using react leaflet | Jacob Stoebel">
+<meta name="twitter:description" content="Using react-leaflet">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/using-react-leaflet">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Using react leaflet</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2017-08-10"> 2017-08-10
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/using-react-leaflet#disqus_thread" data-disqus-identifier="/using-react-leaflet">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>For my new <a href="https://github.com/jstoebel/nightlife">nightlife app</a> I am using <a href="http://leafletjs.com/"><code>leaflet.js</code></a> to handle marking search results on a map. Leaflet was an immediate win for this project because so much comes, basically for free right out of the box: you get beautiful looking maps, markers, and pop ups with hardly anything to configure. What could be better? Oh I know, how about wrapping this functionality in React components! That way I can render a series of markers on a map with something like:</p>
+<div class="highlight"><pre><code class="language-jsx" data-lang="jsx">&lt;Map bounds={this.state.corners}&gt;
+  &lt;TileLayer
+    url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+    attribution='&amp;copy; &lt;a href="http://osm.org/copyright"&gt;OpenStreetMap&lt;/a&gt; contributors'
+  /&gt;
+  {this.props.results.map(this._eachBar)}
+&lt;/Map&gt;</code></pre></div>
+<p>Neato! There are a few gotchas with <code>react-leaflet</code> though. At its core, <code>leaflet</code> is not using React, and instead manipulates the DOM on its own. This creates some interesting, unexpected results. For example when a popup is rendered, its doesn't go where you expect it to go in the virtual DOM:</p>
+<div class="highlight"><pre><code class="language-jsx" data-lang="jsx">&lt;BrowserRouter&gt;&lt;/BrowserRouter&gt;
+&lt;div&gt;
+    &lt;h5&gt; Burgers and Brew &lt;/h5&gt;
+    &lt;/rsvpButton&gt;
+&lt;/div&gt;</code></pre></div>
+<p>Doh! This means that the popup is completely outside the of the context and thus doesn't have access to the redux store. If you were hoping to <code>mapStateToProps</code> like normal, you're out of luck. Instead we have to pass props in the old fashioned way:</p>
+<div class="highlight"><pre><code class="language-jsx" data-lang="jsx">/* 
+  Map.jsx
+  map component. This function shows representation of a single bar which 
+  contains a marker with popup. Since passing in state won't work, we just
+  pass the props in directly. 
+*/
+_eachBar(bar, idx) {
+  // render a single bar on the map
+  //grab the cooridnates in strucutre leaflet requires
+  const coords = [
+    bar.coordinates.latitude,
+    bar.coordinates.longitude
+  ]
+  return (
+    &lt;Marker position={coords} key={idx} &gt;
+      &lt;Popup&gt;
+        &lt;div&gt;
+          &lt;h5&gt;{bar.name}&lt;/h5&gt;
+          &lt;RSVPButton 
+            bar={bar} 
+            currentRSVPs={this.props.currentRSVPs} 
+            onFetchBars={this.props.onFetchBars}
+            onAddError={this.props.onAddError}
+          /&gt;
+        &lt;/div&gt;
+      &lt;/Popup&gt;
+    &lt;/Marker&gt;
+  )
+}</code></pre></div>
+<p>I've only begun to scratch the surface with what leaflet can do. Its not implemented with React so at its core you need to be a little flexible with your style, but in the end I think its worth working with.</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Using react leaflet&amp;url=/using-react-leaflet&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/using-react-leaflet"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>

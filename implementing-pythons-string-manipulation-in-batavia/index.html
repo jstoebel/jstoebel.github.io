@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+  <head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="alternate" href="" hreflang="pt-BR">
+<link href="http://gmpg.org/xfn/11" rel="profile">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="theme-color" content="#005344">
+<title> Implementing Python&#39;s String Manipulation in Batavia | Jacob Stoebel</title>
+<meta name="google-site-verification" content="zS1dSn20XtA4FJYEOQLXqI0boxZdMnJ2g3beje-cl20">
+<meta name="description" content="Implementing Python&#39;s String Manipulation in Batavia">
+<meta name="keywords" content="">
+<!-- Social: Facebook / Open Graph -->
+<meta property="og:url" content="/implementing-pythons-string-manipulation-in-batavia">
+<meta property="og:title" content=" Implementing Python&#39;s String Manipulation in Batavia | Jacob Stoebel">
+<meta property="og:description" content="Implementing Python&#39;s String Manipulation in Batavia">
+<meta property="og:site_name" content="Jacob Stoebel">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:author" content="">
+<meta property="og:image" content="">
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nandomoreirame">
+<meta name="twitter:domain" content="">
+<meta name="twitter:title" content=" Implementing Python&#39;s String Manipulation in Batavia | Jacob Stoebel">
+<meta name="twitter:description" content="Implementing Python&#39;s String Manipulation in Batavia">
+<meta name="twitter:image:src" content="">
+<!-- rel prev and next -->
+<!-- Canonical link tag -->
+<link rel="canonical" href="/implementing-pythons-string-manipulation-in-batavia">
+<link rel="alternate" type="application/rss+xml" title="Jacob Stoebel" href="/feed.xml">
+<link rel="stylesheet" href="/assets/main-ae4a0bdb07b8b7d92bd822cb9c380b96.css">
+<script src="/assets/modernizr-custom-a178f222e841cb9e63710d407fd5400b.js" data-cfasync="false"></script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Website",
+  "publisher": "jstoebel.com",
+  "url": "http://jstoebel.com/",
+  "description": "Software developer and xkcd forwarder. Python, Ruby, JavaScript etc."
+}
+</script>
+<script type="text/javascript">
+  var disqus_shortname = '',
+      baseurl          = '';
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52446115-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+  </head>
+  <body class="post-template single">
+    <header class="header">
+  <div class="container">
+    <h1><a href="/"><strong>Jacob Stoebel
+    </strong></a></h1>
+  </div>
+</header>
+    <main class="wrapper container" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+      <article class="post" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+  <header class="post-header">
+    <h1>Implementing Python's String Manipulation in Batavia</h1>
+    <div class="post-meta">
+      <time datetime="2015-10-13">
+        <i class="fa fa-calendar-o"></i> <time datetime="2016-09-04"> 2016-09-04
+      </time>
+      <!-- <span>
+        <i class="fa fa-comments"></i> <a href="/implementing-pythons-string-manipulation-in-batavia#disqus_thread" data-disqus-identifier="/implementing-pythons-string-manipulation-in-batavia">Leave a comment</a>
+      </span> -->
+      <span>
+      </span>
+    </div>
+  </header>
+  <p>This past week I have been making contributions to <a href="https://github.com/pybee/batavia">Batavia</a> an JavaScript implementation of the Python Virtual Machine. The lowest hanging fruit has been to implement all of the operators for each builtin type (example: <code>str.__add__()</code>, <code>str.__mul__()</code>.) An interesting case came up for me when I started work on <code>str.__mod__()</code>. This type seemed like it would be simple enough (moduluo operation on a string and anything makes no sense. You would think to just throw a TypeError and be done with it) However, the <code>%</code> token is overloaded for strings to do string formatting. So for example:</p>
+<pre><code>&gt;&gt;&gt; x="spam"
+&gt;&gt;&gt; x="I like %s"
+&gt;&gt;&gt; y = "spam"
+&gt;&gt;&gt; x % y
+'I like spam'
+</code></pre>
+<p>The picture is further complicated by the fact that there are numerous <a href="https://docs.python.org/2/library/stdtypes.html#string-formatting-operations">kinds of markers</a> specifying different types and various other characters like <code>+</code>, <code>-</code> and others can add additional complexity.</p>
+<p>To be clear, Python3 <a href="https://pyformat.info/">recommends</a> using <code>.format</code> for string formatting now, but continues to support overloading the mod operator.</p>
+<p>Starting to dive into the problem, I quickly found myself in over my head. Fortunately, <a href="https://www.brython.info/">Brython</a> which is a full implementation of Python in JavaScript has already taken this problem on. I did find one deficiency however:</p>
+<pre><code># using Brython
+&gt;&gt;&gt; x = "three args: %s | %s | %s"
+&gt;&gt;&gt; x % False
+"three args: False | False | False"
+</code></pre>
+<p>It shouldn't accept that. Since there are three markers and one argument provided, an exception should be thrown: <code>TypeError: not enough arguments for format string</code>.  My thinking was that if the method could first ensure that the number of markers matches the number of arguments we could then proceed with formatting. Otherwise throw the right exception right off the bat.</p>
+<p>To do that, I used a big scary regex to capture all of the markers:</p>
+<p><code>/\x25(?:([1-9]\d*)\$|\(([^\)]+)\))?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-gijosuxX])/g</code></p>
+<p>Yikes! Even though I don't follow all of it, it fortunately works in my browser and in node. Unfortunately, unit tests are run using phantomjs, a headless webkit, and the regex does not work there. That puts us in a situation where tests produce one result, but when fired up in the browser, produce a different result.</p>
+<p>Through a bit of trial an error I found that phantomjs doesn't like any regex involving the literal <code>+</code> operator. I filed a ticket with <a href="https://github.com/ariya/phantomjs/issues/14525">phantomjs</a> and <a href="https://github.com/pybee/batavia/issues/247">batavia</a> and am waiting to see if the community can provide guidance on what to do next.</p>
+  <footer class="post-footer">
+    <section class="author">
+      <h4>Jacob Stoebel</h4>
+      <p>I am a software developer living in Berea, KY. I spend my days writing web applications (Ruby, Python, JavaScript), working with data, and leveling up as a software engineer. This is my blog.</p>
+    </section>
+<aside class="share">
+  <h4>Share this.</h4>
+  <a href="http://twitter.com/share?text=Implementing Python's String Manipulation in Batavia&amp;url=/implementing-pythons-string-manipulation-in-batavia&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+  onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    <i class="fa fa-twitter-square"></i>
+  </a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=/implementing-pythons-string-manipulation-in-batavia"
+  onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    <i class="fa fa-facebook-square"></i>
+  </a>
+</aside>
+  </footer>
+</article>
+    </main>
+<footer class="footer">
+  <div class="container">
+    <ul class="icons">
+      <li>
+        <a href="http://github.com/jstoebel" class="icon-github" target="_blank">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a href="http://twitter.com/jstoebel" class="icon-twitter" target="_blank">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/jacob-stoebel-71705223?trk=nav_responsive_tab_profile" class="icon-linkedin" target="_blank">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+    </ul>
+    <small class="clearfix">
+      Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> • <a href="https://github.com/nandomoreirame/nandomoreira-jekyll-theme" target="_blank">Open source <i class="fa fa-heart"></i></a>
+    </small>
+  </div>
+</footer>
+<a class="scroll-up fa fa-chevron-up bounce" href="#" data-position="0"></a>
+<div id="modalSearch" class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__content">
+    <a href="#!" class="modal-close" data-modal-close>&times;</a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search in 73 articles">
+      <ul id="results-container"></ul>
+    </div>
+  </div>
+</div>
+    <script src="/assets/main-69446ef6b2d910ebb61c148a57aa3fdb.js"></script>
+  </body>
+</html>
